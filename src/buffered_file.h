@@ -3,6 +3,9 @@
  * Works, unlike using fdopen(3) on a socket, and a bit more appropriate to our
  * use than dup(2)ing the socket and using fdopen anyway. */
 
+#ifndef _BUFFERED_FILE_H
+#define _BUFFERED_FILE_H 1
+
 struct buffered_file;
 
 /* Reads one newline terminated line from file.  Returns false if EOF is
@@ -46,3 +49,5 @@ error__t destroy_buffered_file(struct buffered_file *file);
 /* Returns the error status of the buffered file.  If false is returned then an
  * error condition has been detected. */
 bool check_buffered_file(struct buffered_file *file);
+
+#endif

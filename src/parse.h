@@ -1,6 +1,9 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /* Simple parsing support. */
 
+#ifndef _PARSE_H
+#define _PARSE_H 1
+
 /* Must be long enough to send a line of waveform data (256 uints) in one buffer */
 #define MAX_LINE_LENGTH 3072 // 3KB
 
@@ -78,3 +81,5 @@ error__t __attribute__((format(printf, 3, 4))) format_string_(
  * entries in count. */
 error__t format_uint32_array(
     char **result, size_t *length, const uint32_t value[], size_t count);
+
+#endif

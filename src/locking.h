@@ -1,5 +1,8 @@
 /* Helper functions for lock support. */
 
+#ifndef _LOCKING_H
+#define _LOCKING_H 1
+
 /* Basic mutex lock/unlock. */
 #define _LOCK(mutex)     ASSERT_PTHREAD(pthread_mutex_lock(&(mutex)))
 #define _UNLOCK(mutex)   ASSERT_PTHREAD(pthread_mutex_unlock(&(mutex)))
@@ -70,3 +73,5 @@ bool pwait_deadline(
 /* Computes deadline from timeout. */
 void compute_deadline(
     const struct timespec *timeout, struct timespec *deadline);
+
+#endif 
