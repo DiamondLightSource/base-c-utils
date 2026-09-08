@@ -1,5 +1,8 @@
 /* Hash table interface. */
 
+#ifndef _HASH_TABLE_H
+#define _HASH_TABLE_H 1
+
 
 /* We implement the hash table as an opaque type, all the work will be done
  * inside hashtable.c. */
@@ -93,3 +96,5 @@ struct hash_table *hash_table_create_generic(const struct hash_table_ops *ops);
 
 /* Hash table keyed by pointers.  Also use this for integer indexed tables. */
 struct hash_table *hash_table_create_ptrs(void);
+
+#endif

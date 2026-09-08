@@ -94,6 +94,8 @@
  *      formatting arguments are ignored.
  */
 
+#ifndef _ERROR_H
+#define _ERROR_H 1
 
 /* Hint to compiler that x is likely to be 0 or NULL. */
 #define unlikely(x)   __builtin_expect((!!x), 0)
@@ -373,3 +375,5 @@ void start_logging(const char *ident);
 
 /* Debug utility for dumping binary data in ASCII format. */
 void dump_binary(FILE *out, const void *buffer, size_t length);
+
+#endif 
