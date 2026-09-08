@@ -134,19 +134,15 @@ void start_logging(const char *ident)
 
 void vlog_message(int priority, const char *format, va_list args)
 {
-    /* Note that we CANNOT safely use WITH_MUTEX here for one simple reason: if
-     * the ASSERT_PTHREAD fails then we can be trying to handle an assert fail
-     * inside an assert fail handler; this will not end well. */
-    WITH_MUTEX_UNCHECKED(log_mutex)
+    pthread_mutex_lock(&log_mutex);
+    if (daemon_mode)
+        vsyslog(priority, format, args);
+    else
     {
-        if (daemon_mode)
-            vsyslog(priority, format, args);
-        else
-        {
-            vfprintf(stderr, format, args);
-            fprintf(stderr, "\n");
-        }
+        vfprintf(stderr, format, args);
+        fprintf(stderr, "\n");
     }
+    pthread_mutex_unlock(&log_mutex);
 }
 
 
