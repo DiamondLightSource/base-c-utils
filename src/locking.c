@@ -24,9 +24,10 @@ void pwait_initialise(pthread_cond_t *signal)
 
 
 void compute_deadline(
-    const struct timespec *timeout, struct timespec *deadline)
+    const struct timespec *timeout, clockid_t clock_id, 
+    struct timespec *deadline)
 {
-    ASSERT_IO(clock_gettime(CLOCK_MONOTONIC, deadline));
+    ASSERT_IO(clock_gettime(clock_id, deadline));
 
     deadline->tv_sec  += timeout->tv_sec;
     deadline->tv_nsec += timeout->tv_nsec;
@@ -55,9 +56,9 @@ bool pwait_deadline(
 
 bool pwait_timeout(
     pthread_mutex_t *mutex, pthread_cond_t *signal,
-    const struct timespec *timeout)
+    const struct timespec *timeout, clockid_t clock_id)
 {
     struct timespec deadline;
-    compute_deadline(timeout, &deadline);
+    compute_deadline(timeout, clock_id, &deadline);
     return pwait_deadline(mutex, signal, &deadline);
 }
