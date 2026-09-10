@@ -63,7 +63,7 @@ void pwait_initialise(pthread_cond_t *signal);
  * timeout intervened. */
 bool pwait_timeout(
     pthread_mutex_t *mutex, pthread_cond_t *signal,
-    const struct timespec *timeout);
+    const struct timespec *timeout, clockid_t clock_id);
 
 /* As for pwait_timeout, but in this case the timeout is an absolute time. */
 bool pwait_deadline(
@@ -72,6 +72,6 @@ bool pwait_deadline(
 
 /* Computes deadline from timeout. */
 void compute_deadline(
-    const struct timespec *timeout, struct timespec *deadline);
+    const struct timespec *timeout, clockid_t clock_id, struct timespec *deadline);
 
 #endif 
