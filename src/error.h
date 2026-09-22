@@ -32,8 +32,9 @@
  *  TEST_OK      TEST_OK_      ASSERT_OK       Fail if expression is false
  *  TEST_IO      TEST_IO_      ASSERT_IO       Fail if expression is -1
  *  TEST_OK_IO   TEST_OK_IO_   ASSERT_OK_IO    Fail if false, reports errno
+ *  TEST_NULL    TEST_NULL_    ASSERT_NULL     Fail if expression is NUll
  *  TEST_PTHREAD TEST_PTHREAD_ ASSERT_PTHREAD  Fail if expression is not 0
- *
+ * 
  * The three patterns behave thus:
  *
  *  TEST_xx(expr)
@@ -167,6 +168,10 @@ void log_error(const char *message, ...)
     __attribute__((format(printf, 1, 2)));
 void vlog_message(int priority, const char *format, va_list args);
 
+/* Controls whether to emit log_message() output. */
+void verbose_logging(bool verbose);
+/* Controls whether to print timestamps on logged message output. */
+void timestamp_logging(bool timestamps);
 /* Once this has been called all logged message will be sent to syslog. */
 void start_logging(const char *ident);
 
@@ -214,6 +219,13 @@ void start_logging(const char *ident);
 #define TEST_IO(expr)               TEST_IO_(expr, ERROR_MESSAGE)
 #define ASSERT_IO(expr)             _ASSERT(_COND_IO, _MSG_IO, expr)
 
+/* Tests a pointer for NULL: NULL => error. */
+#define _COND_NULL(expr)              ((intptr_t) (expr))
+#define _MSG_NULL(expr)               _error_extra_io()
+#define TEST_NULL_(expr, message...)  _TEST(_COND_NULL, _MSG_NULL, expr, message)
+#define TEST_NULL(expr)               TEST_NULL_(expr, ERROR_MESSAGE)
+#define ASSERT_NULL(expr)             _ASSERT(_COND_NULL, _MSG_NULL, expr)
+
 /* Tests an ordinary boolean: false => error. */
 #define _COND_OK(expr)              ((bool) (expr))
 #define _MSG_OK(expr)               NULL
@@ -223,6 +235,33 @@ void start_logging(const char *ident);
 #define TEST_OK_IO_(expr, message...) _TEST(_COND_OK, _MSG_IO, expr, message)
 #define TEST_OK_IO(expr)            TEST_OK_IO_(expr, ERROR_MESSAGE)
 #define ASSERT_OK_IO(expr)          _ASSERT(_COND_OK, _MSG_IO, expr)
+
+/* Tests the return from a pthread_ call: a non zero return is the error
+ * code!  We just assign this to errno. */
+#define _COND_PTHREAD(expr)         ((expr) == 0)
+#define _MSG_PTHREAD(expr)          (_error_extra_io_errno(expr))
+#define TEST_PTHREAD_(expr, message...) \
+    _TEST(_COND_PTHREAD, _MSG_PTHREAD, expr, message)
+#define TEST_PTHREAD(expr)          TEST_PTHREAD_(expr, ERROR_MESSAGE)
+#define ASSERT_PTHREAD(expr)        _ASSERT(_COND_PTHREAD, _MSG_PTHREAD, expr)
+
+/* Testing read and write happens often enough to be annoying, so some
+ * special case macros here. */
+#define _COND_rw(rw, fd, buf, count) \
+    (ensure_##rw(fd, buf, count) == (ssize_t) (count))
+#define TEST_READ(fd, buf, count)   TEST_OK(_COND_rw(read, fd, buf, count))
+#define TEST_WRITE(fd, buf, count)  TEST_OK(_COND_rw(write, fd, buf, count))
+#define TEST_READ_(fd, buf, count, message...) \
+    TEST_OK_(_COND_rw(read, fd, buf, count), message)
+#define TEST_WRITE_(fd, buf, count, message...) \
+    TEST_OK_(_COND_rw(write, fd, buf, count), message)
+
+/* These wrappers around read and write make an extra bit of effort to process
+ * the entire count bytes.  It is still possible for them to fail or to return a
+ * value less than count; note that if an error is returned data may have been
+ * partially written. */
+ssize_t ensure_write(int fd, const void *buf, size_t count);
+ssize_t ensure_read(int fd, void *buf, size_t count);
 
 /* Tests the return from a pthread_ call: a non zero return is the error
  * code!  We just assign this to errno. */
