@@ -24,7 +24,7 @@ HEADERS = $(addprefix $(INC_DIR)/, $(INCS))
 install: $(OBJS) $(HEADERS)
 	ar rc $(LIB_DIR)/$(LIBRARY_NAME) $(OBJS)
 
-COMPILE = $(CC) -fPIC $(USR_LDFLAGS) $(USR_CFLAGS) $(USR_CPPFLAGS)
+COMPILE = $(CC) -fPIC $(LDFLAGS) $(CFLAGS) $(CPPFLAGS)
 
 $(ARCH)/%.o: %.c $(ARCH)
 	$(COMPILE) -c -o $@ $< 
