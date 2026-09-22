@@ -8,13 +8,14 @@ system.
 
 ## Contents 
 
-| File (.c/.h)  | Description | Dependencies |
+| File (.c/.h)  | Description | Dependencies (.c/.h) |
 | ------------  | ----------- | ------------ |
-| error         | Framework for handling and reporting errors. | None |
-| buffered_file | Buffered interface for reading/writing to a socket | error |
-| hashtable     | Hashtable implimentation | error |
-| locking       | Helper functions for interations with mutex's | error |
-| parse         | Simple parsing support | error | 
+| common        | Common logging and other utilities | None |
+| error         | Framework for handling and reporting errors. | common |
+| buffered_file | Buffered interface for reading/writing to a socket | common, error |
+| hashtable     | Hashtable implimentation | common |
+| locking       | Helper functions for interations with mutex's | common, error |
+| parse         | Simple parsing support | common, error | 
 
 ## Build
 

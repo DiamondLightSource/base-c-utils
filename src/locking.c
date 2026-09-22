@@ -8,7 +8,9 @@
 #include <pthread.h>
 #include <stdio.h>
 
+#include "common.h"
 #include "error.h"
+
 #include "locking.h"
 
 
