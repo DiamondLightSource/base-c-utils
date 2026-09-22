@@ -119,11 +119,22 @@ bool error_report(error__t error)
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-static bool daemon_mode = false;
-static bool log_verbose = true;
-
 static pthread_mutex_t log_mutex = PTHREAD_MUTEX_INITIALIZER;
 
+static bool daemon_mode = false;
+static bool log_verbose = true;
+/* Timestamp each log message. */
+static bool log_timestamps = false;
+
+void verbose_logging(bool verbose)
+{
+    log_verbose = verbose;
+}
+
+void timestamp_logging(bool timestamps)
+{
+    log_timestamps = timestamps;
+}
 
 void start_logging(const char *ident)
 {
@@ -132,13 +143,40 @@ void start_logging(const char *ident)
 }
 
 
+static void print_timestamp(struct timespec *timestamp)
+{
+    /* Convert ns into microseconds, the extra ns detail is a bit much. */
+    long usec = (timestamp->tv_nsec + 500) / 1000;
+    if (usec >= 1000000)
+    {
+        usec -= 1000000;
+        timestamp->tv_sec += 1;
+    }
+
+    /* Print the result in local time. */
+    struct tm tm;
+    localtime_r(&timestamp->tv_sec, &tm);
+
+    fprintf(stderr, "%04d-%02d-%02d %02d:%02d:%02d.%06ld: ",
+        1900 + tm.tm_year, tm.tm_mon + 1, tm.tm_mday,
+        tm.tm_hour, tm.tm_min, tm.tm_sec, usec);
+}
+
+
 void vlog_message(int priority, const char *format, va_list args)
 {
+    /* Get the timestamp before entering the lock for more honest times. */
+    struct timespec now;
+    if (log_timestamps)
+        clock_gettime(CLOCK_REALTIME, &now);
+
     pthread_mutex_lock(&log_mutex);
     if (daemon_mode)
         vsyslog(priority, format, args);
     else
     {
+        if (log_timestamps)
+            print_timestamp(&now);
         vfprintf(stderr, format, args);
         fprintf(stderr, "\n");
     }
@@ -219,6 +257,31 @@ void _error_panic(char *extra, const char *filename, int line)
     _exit(255);
 }
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* Helper functions for reading and writing. */
+
+#define ENSURE_ACTION(action, fd, buf, count) \
+    size_t total = 0; \
+    while (count > total) \
+    { \
+        ssize_t processed = action(fd, buf + total, count - total); \
+        if (processed < 0) \
+            return processed; \
+        else if (processed == 0) \
+            break; \
+        total += (size_t) processed; \
+    } \
+    return (ssize_t) total
+
+ssize_t ensure_write(int fd, const void *buf, size_t count)
+{
+    ENSURE_ACTION(write, fd, buf, count);
+}
+
+ssize_t ensure_read(int fd, void *buf, size_t count)
+{
+    ENSURE_ACTION(read, fd, buf, count);
+}
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
