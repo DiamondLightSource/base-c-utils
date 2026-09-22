@@ -259,6 +259,15 @@ void start_logging(const char *ident);
     } )
 #define TRY_CATCH(args...) _id_TRY_CATCH(UNIQUE_ID(), args)
 
+/* If expr fails return the error. Not to be used for the final return of a 
+ * function */
+#define _id_RETURN_ON_ERROR(error, expr)    \
+({                                          \
+    error__t error = (expr);                \
+    if (unlikely(error)) { return error; }  \
+}) 
+#define RETURN_ON_ERROR(expr) _id_RETURN_ON_ERROR(UNIQUE_ID(), expr)
+
 
 /* Returns result of action, but first unconditionally performs cleanup. */
 #define _id_DO_FINALLY(error, action, finally...) \
