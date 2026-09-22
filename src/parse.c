@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <ctype.h>
 
+#include "common.h"
 #include "error.h"
 
 #include "parse.h"

@@ -32,7 +32,6 @@
  *  TEST_OK      TEST_OK_      ASSERT_OK       Fail if expression is false
  *  TEST_IO      TEST_IO_      ASSERT_IO       Fail if expression is -1
  *  TEST_OK_IO   TEST_OK_IO_   ASSERT_OK_IO    Fail if false, reports errno
- *  TEST_NULL    TEST_NULL_    ASSERT_NULL     Fail if expression is NUll
  *  TEST_PTHREAD TEST_PTHREAD_ ASSERT_PTHREAD  Fail if expression is not 0
  * 
  * The three patterns behave thus:
@@ -116,10 +115,6 @@ typedef struct error__t *error__t;  // Alas error_t is already spoken for!
  * nothing to report then false is returned, otherwise true is returned. */
 bool error_report(error__t error);
 
-/* A helper macro to extend the reported error with context. */
-#define ERROR_REPORT(expr, format...) \
-    error_report(error_extend(expr, format))
-
 /* This function silently discards the error code, returns true if there was an
  * error. */
 bool error_discard(error__t error);
@@ -147,6 +142,7 @@ const char *error_format(error__t error);
 /* Called to report unrecoverable error.  Terminates program without return. */
 void _error_panic(char *extra, const char *filename, int line)
     __attribute__((__noreturn__));
+    
 /* Performs normal error report. */
 error__t _error_create(char *extra, const char *format, ...)
     __attribute__((format(printf, 2, 3)));
@@ -157,34 +153,13 @@ static inline void *__attribute__((nonnull)) _nonnull(void *arg) { return arg; }
 /* Mechanism for reporting extra error information from errno.  The string
  * returned must be released by the caller. */
 char *_error_extra_io(void);
+
 /* Same mechanism, but taking specific error code. */
 char *_error_extra_io_errno(int error);
 
 
-/* Routines to write informative message or error to stderr or syslog. */
-void log_message(const char *message, ...)
-    __attribute__((format(printf, 1, 2)));
-void log_error(const char *message, ...)
-    __attribute__((format(printf, 1, 2)));
-void vlog_message(int priority, const char *format, va_list args);
-
-/* Controls whether to emit log_message() output. */
-void verbose_logging(bool verbose);
-/* Controls whether to print timestamps on logged message output. */
-void timestamp_logging(bool timestamps);
-/* Once this has been called all logged message will be sent to syslog. */
-void start_logging(const char *ident);
-
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /* The core error handling macros. */
-
-/* A dance for generating unique local identifiers.  This involves a number of
- * tricky C preprocessor techniques, and uses the gcc __COUNTER__ extension. */
-#define _CONCATENATE(a, b)  a##b
-#define CONCATENATE(a, b)   _CONCATENATE(a, b)
-#define UNIQUE_ID()         CONCATENATE(_eid__, __COUNTER__)
-
 
 /* Generic TEST macro: computes a boolean from expr using COND (should be a
  * macro), and generates the given error message if the boolean is false.  If
@@ -197,6 +172,7 @@ void start_logging(const char *ident);
             ERROR_OK; \
     } )
 #define _TEST(args...)  _id_TEST(UNIQUE_ID(), args)
+
 
 /* An assert for tests that really really should not fail!  The program will
  * terminate immediately. */
@@ -212,6 +188,7 @@ void start_logging(const char *ident);
 /* Default error message for unexpected errors. */
 #define ERROR_MESSAGE       "Unexpected error at %s:%d", __FILE__, __LINE__
 
+
 /* Tests system calls: -1 => error, pick up error data from errno. */
 #define _COND_IO(expr)              ((intptr_t) (expr) != -1)
 #define _MSG_IO(expr)               _error_extra_io()
@@ -219,12 +196,6 @@ void start_logging(const char *ident);
 #define TEST_IO(expr)               TEST_IO_(expr, ERROR_MESSAGE)
 #define ASSERT_IO(expr)             _ASSERT(_COND_IO, _MSG_IO, expr)
 
-/* Tests a pointer for NULL: NULL => error. */
-#define _COND_NULL(expr)              ((intptr_t) (expr))
-#define _MSG_NULL(expr)               _error_extra_io()
-#define TEST_NULL_(expr, message...)  _TEST(_COND_NULL, _MSG_NULL, expr, message)
-#define TEST_NULL(expr)               TEST_NULL_(expr, ERROR_MESSAGE)
-#define ASSERT_NULL(expr)             _ASSERT(_COND_NULL, _MSG_NULL, expr)
 
 /* Tests an ordinary boolean: false => error. */
 #define _COND_OK(expr)              ((bool) (expr))
@@ -236,32 +207,6 @@ void start_logging(const char *ident);
 #define TEST_OK_IO(expr)            TEST_OK_IO_(expr, ERROR_MESSAGE)
 #define ASSERT_OK_IO(expr)          _ASSERT(_COND_OK, _MSG_IO, expr)
 
-/* Tests the return from a pthread_ call: a non zero return is the error
- * code!  We just assign this to errno. */
-#define _COND_PTHREAD(expr)         ((expr) == 0)
-#define _MSG_PTHREAD(expr)          (_error_extra_io_errno(expr))
-#define TEST_PTHREAD_(expr, message...) \
-    _TEST(_COND_PTHREAD, _MSG_PTHREAD, expr, message)
-#define TEST_PTHREAD(expr)          TEST_PTHREAD_(expr, ERROR_MESSAGE)
-#define ASSERT_PTHREAD(expr)        _ASSERT(_COND_PTHREAD, _MSG_PTHREAD, expr)
-
-/* Testing read and write happens often enough to be annoying, so some
- * special case macros here. */
-#define _COND_rw(rw, fd, buf, count) \
-    (ensure_##rw(fd, buf, count) == (ssize_t) (count))
-#define TEST_READ(fd, buf, count)   TEST_OK(_COND_rw(read, fd, buf, count))
-#define TEST_WRITE(fd, buf, count)  TEST_OK(_COND_rw(write, fd, buf, count))
-#define TEST_READ_(fd, buf, count, message...) \
-    TEST_OK_(_COND_rw(read, fd, buf, count), message)
-#define TEST_WRITE_(fd, buf, count, message...) \
-    TEST_OK_(_COND_rw(write, fd, buf, count), message)
-
-/* These wrappers around read and write make an extra bit of effort to process
- * the entire count bytes.  It is still possible for them to fail or to return a
- * value less than count; note that if an error is returned data may have been
- * partially written. */
-ssize_t ensure_write(int fd, const void *buf, size_t count);
-ssize_t ensure_read(int fd, void *buf, size_t count);
 
 /* Tests the return from a pthread_ call: a non zero return is the error
  * code!  We just assign this to errno. */
@@ -271,16 +216,20 @@ ssize_t ensure_read(int fd, void *buf, size_t count);
     _TEST(_COND_PTHREAD, _MSG_PTHREAD, expr, message)
 #define TEST_PTHREAD(expr)          TEST_PTHREAD_(expr, ERROR_MESSAGE)
 #define ASSERT_PTHREAD(expr)        _ASSERT(_COND_PTHREAD, _MSG_PTHREAD, expr)
+
 
 /* For marking unreachable code.  Same as ASSERT_OK(false). */
 #define ASSERT_FAIL()               _error_panic(NULL, __FILE__, __LINE__)
+
 
 /* For failing immediately.  Same as TEST_OK_(false, message...) */
 #define FAIL()                      TEST_OK(false)
 #define FAIL_(message...)           _nonnull(_error_create(NULL, message))
 
+
 /* Action that unconditionally succeeds. */
 #define DO(action...)                   ({action; ERROR_OK;})
+
 
 /* These two macros facilitate using the macros above by creating if
  * expressions that are slightly more sensible looking than ?: in context. */
@@ -298,15 +247,6 @@ ssize_t ensure_read(int fd, void *buf, size_t count);
     } )
 #define TRY_CATCH(args...) _id_TRY_CATCH(UNIQUE_ID(), args)
 
-/* If expr fails return the error. Not to be used for the final return of a 
- * function */
-#define _id_RETURN_ON_ERROR(error, expr)    \
-({                                          \
-    error__t error = (expr);                \
-    if (unlikely(error)) { return error; }  \
-}) 
-#define RETURN_ON_ERROR(expr) _id_RETURN_ON_ERROR(UNIQUE_ID(), expr)
-
 
 /* Returns result of action, but first unconditionally performs cleanup. */
 #define _id_DO_FINALLY(error, action, finally...) \
@@ -317,76 +257,20 @@ ssize_t ensure_read(int fd, void *buf, size_t count);
     })
 #define DO_FINALLY(args...) _id_DO_FINALLY(UNIQUE_ID(), args)
 
+/* Wrapper around mutex lock/unlock.  The unlock call does not need to be
+ * checked as the only valid return code (EPERM) does not apply. */
+#define WITH_MUTEX(mutex) \
+    _WITH_ENTER_LEAVE( \
+        ASSERT_PTHREAD(pthread_mutex_lock(&mutex)), \
+        pthread_mutex_unlock(&mutex))
 
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-/* The following miscellaneous macros are extra to the error mechanism. */
-
-/* For ignoring return values even when warn_unused_result is in force. */
-#define IGNORE(e)       do if(e) {} while (0)
-
-/* A tricksy compile time bug checking macro modified from the kernel.  Causes a
- * compiler error if e doesn't evaluate to true (a non-zero value). */
-#define COMPILE_ASSERT(e)           ((void) sizeof(struct { int:-!(e); }))
-
-/* For a static version we drop the COMPILE_ASSERT() expression into a
- * discardable anonymous function. */
-#define _id_STATIC_COMPILE_ASSERT(f, e) \
-    static inline void f(void) { COMPILE_ASSERT(e); }
-#define STATIC_COMPILE_ASSERT(e)    _id_STATIC_COMPILE_ASSERT(UNIQUE_ID(), e)
-
-
-/* Use this to mark functions that can be constant folded, ie depend only on
- * their arguments and global state. */
-#define _pure __attribute__((pure))
-
-
-/* A rather randomly placed helper routine.  This and its equivalents are
- * defined all over the place, but there doesn't appear to be a definitive
- * definition anywhere. */
-#define ARRAY_SIZE(a)   (sizeof(a)/sizeof((a)[0]))
-
-/* Casting from one type to another with checking via a union.  Needed in
- * particular to reassure the compiler about aliasing. */
-#define _id_CAST_FROM_TO(_union, from_type, to_type, value) \
-    ( { \
-        COMPILE_ASSERT(sizeof(from_type) == sizeof(to_type)); \
-        union { \
-            from_type _value; \
-            to_type _cast; \
-        } _union = { ._value = (value) }; \
-        _union._cast; \
-    } )
-#define CAST_FROM_TO(args...) \
-    _id_CAST_FROM_TO(UNIQUE_ID(), args)
-
-#define CAST_TO(to_type, value) CAST_FROM_TO(typeof(value), to_type, value)
-
-/* A macro for ensuring that a value really is assign compatible to the
- * requested type.  Note that due to restrictions on syntax this won't work if
- * type is a written out function type, as in that case the [] part needs to be
- * inside the type definition! */
-#define ENSURE_TYPE(type, value)    (*(type []) { (value) })
-
-
-/* A couple of handy macros: macro safe MIN and MAX functions. */
-#define _MIN(tx, ty, x, y) \
-    ( { typeof(x) tx = (x); typeof(y) ty = (y); tx < ty ? tx : ty; } )
-#define _MAX(tx, ty, x, y) \
-    ( { typeof(x) tx = (x); typeof(y) ty = (y); tx > ty ? tx : ty; } )
-#define MIN(x, y)   _MIN(UNIQUE_ID(), UNIQUE_ID(), x, y)
-#define MAX(x, y)   _MAX(UNIQUE_ID(), UNIQUE_ID(), x, y)
-
-
-/* Casts a member of a structure out to the containing structure. */
-#define _id_container_of(mptr, ptr, type, member) \
-    ( { \
-        typeof(((type *)0)->member) *mptr = (ptr); \
-        (type *)((void *) mptr - offsetof(type, member)); \
-    } )
-#define container_of(args...)   _id_container_of(UNIQUE_ID(), args)
-
-/* Debug utility for dumping binary data in ASCII format. */
-void dump_binary(FILE *out, const void *buffer, size_t length);
+/* Wraps a mutex call around the calculation of error, returns the error code
+ * result. */
+#define ERROR_WITH_MUTEX(mutex, error) \
+    ( \
+        ASSERT_PTHREAD(pthread_mutex_lock(&mutex)), \
+        DO_FINALLY(error, \
+            pthread_mutex_unlock(&mutex)) \
+    )
 
 #endif 

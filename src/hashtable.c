@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "error.h"      // Just for CAST_FROM_TO
+#include "common.h"      // Just for CAST_FROM_TO
 #include "hashtable.h"
 
 

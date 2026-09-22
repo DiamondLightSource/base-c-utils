@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "error.h"
+#include "common.h"
 
 #include "buffered_file.h"
 
