@@ -1,6 +1,5 @@
 TOP := $(CURDIR)
 
-
 # ------------------------------------------------------------------------------
 # Build library files
 #
@@ -13,25 +12,21 @@ CC ?= $(CC)
 LIB_BASE_DIR = $(TOP)/lib
 LIB_DIR = $(LIB_BASE_DIR)/$(ARCH)
 
-INC_DIR= $(TOP)/include
+INC_DIR = $(TOP)/include
 
-# Only build wanted files by specifing DEPS
-build: $(LIB_DIR) $(INC_DIR)
+build: create_dirs 
 	$(MAKE) -C $(SRC_DIR) CC="$(CC)" ARCH="$(ARCH)" 
 
-$(LIB_DIR):
-	mkdir -p $(LIB_DIR)
-
-$(INC_DIR):
-	mkdir -p $(INC_DIR)
+REQUIRED_DIRS += $(LIB_DIR) $(LIB_BASE_DIR) $(INC_DIR)
+create_dirs:
+	mkdir -p $(REQUIRED_DIRS)
 
 # ------------------------------------------------------------------------------
-# Documentation
-#
 
-docs:
+clean: make_clean rm_dirs
 
+rm_dirs: 
+	rm -rf $(REQUIRED_DIRS)
 
-
-clean: $(SRC_DIR)
+make_clean: $(SRC_DIR)
 	$(MAKE) -C $< clean
