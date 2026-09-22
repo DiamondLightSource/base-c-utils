@@ -4,9 +4,6 @@
 #ifndef _PARSE_H
 #define _PARSE_H 1
 
-/* Must be long enough to send a line of waveform data (256 uints) in one buffer */
-#define MAX_LINE_LENGTH 3072 // 3KB
-
 /* Incements *string to first non space character in string. */
 void skip_whitespace(const char **string);
 
