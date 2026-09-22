@@ -1,7 +1,6 @@
 
 include Makefile.extra
 
-# Must contain prefix 'lib' for epics to find it
 LIBRARY_NAME = libc-utils.a
 
 SRCS += buffered_file.c 
@@ -18,19 +17,19 @@ INCS += parse.h
 
 OBJS = $(addprefix $(ARCH)/, $(SRCS:.c=.o))
 
-INCLUDE_PATH = ../include
+INC_DIR = ../include
 LIB_DIR = ../lib/$(ARCH)
-HEADERS = $(addprefix $(INCLUDE_PATH)/, $(INCS))
+HEADERS = $(addprefix $(INC_DIR)/, $(INCS))
 
 install: $(OBJS) $(HEADERS)
 	ar rc $(LIB_DIR)/$(LIBRARY_NAME) $(OBJS)
 
-COMPILE = $(CC) -fPIC $(USR_LDFLAGS) $(USR_CFLAGS)
+COMPILE = $(CC) -fPIC $(USR_LDFLAGS) $(USR_CFLAGS) $(USR_CPPFLAGS)
 
 $(ARCH)/%.o: %.c $(ARCH)
 	$(COMPILE) -c -o $@ $< 
 
-$(INCLUDE_PATH)/%.h: %.h
+$(INC_DIR)/%.h: %.h
 	cp $< $@
 
 $(ARCH): 
