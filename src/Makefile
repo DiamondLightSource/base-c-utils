@@ -1,41 +1,44 @@
 
+ifndef TOP
+$(error Do not call this make file directly)
+endif
+
 include Makefile.extra
 
 LIBRARY_NAME = libc-utils.a
 
-SRCS += buffered_file.c 
-SRCS += error.c 
-SRCS += hashtable.c 
-SRCS += locking.c 
-SRCS += parse.c 
+SRCS=$(wildcard *.c)
+HEADERS=$(wildcard *.h)
 
-INCS += buffered_file.h 
-INCS += error.h 
-INCS += hashtable.h 
-INCS += locking.h 
-INCS += parse.h 
+INC_DIR = $(TOP)/include
+LIB_BASE_DIR = $(TOP)/lib
+LIB_DIR = $(LIB_BASE_DIR)/$(ARCH)
+OBJ_DIR = O.$(ARCH)
 
-OBJS = $(addprefix $(ARCH)/, $(SRCS:.c=.o))
+REQUIRED_DIRS = $(INC_DIR) $(LIB_DIR) $(OBJ_DIR) 
 
-INC_DIR = ../include
-LIB_DIR = ../lib/$(ARCH)
-HEADERS = $(addprefix $(INC_DIR)/, $(INCS))
+INCS = $(addprefix $(INC_DIR)/, $(HEADERS))
+OBJS = $(addprefix $(OBJ_DIR)/, $(SRCS:.c=.o))
+LIB = $(LIB_DIR)/$(LIBRARY_NAME)
 
-install: $(OBJS) $(HEADERS)
-	ar rc $(LIB_DIR)/$(LIBRARY_NAME) $(OBJS)
+default: $(REQUIRED_DIRS) $(OBJS) $(INCS) $(LIB)
+	
+COMPILE = $(CC) -fPIC $(LDFLAGS) $(CFLAGS) $(CPPFLAGS) $(CFLAGS_EXTRA)
 
-COMPILE = $(CC) -fPIC $(LDFLAGS) $(CFLAGS) $(CPPFLAGS)
+$(REQUIRED_DIRS):
+	mkdir -p $@
 
-$(ARCH)/%.o: %.c $(ARCH)
-	$(COMPILE) -c -o $@ $< 
+$(OBJ_DIR)/%.o: %.c
+	$(COMPILE) -c -o $@ $<
 
-$(INC_DIR)/%.h: %.h
-	cp $< $@
+$(INCS): $(INC_DIR)
+	cp $(HEADERS) $(INC_DIR)
 
-$(ARCH): 
-	mkdir -p $(ARCH)
+$(LIB): $(LIB_DIR)
+	ar rc $(LIB) $(OBJS)
 
 clean: 
-	rm -rf linux-*
+	rm -rf $(REQUIRED_DIRS)
+	rm -rf $(LIB_BASE_DIR)
 
 .DELETE_ON_ERROR:
