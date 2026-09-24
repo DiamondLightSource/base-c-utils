@@ -15,14 +15,14 @@ LIB_BASE_DIR = $(TOP)/lib
 LIB_DIR = $(LIB_BASE_DIR)/$(ARCH)
 OBJ_DIR = O.$(ARCH)
 
-REQUIRED_DIRS = $(INC_DIR) $(LIB_DIR) $(OBJ_DIR) 
+REQUIRED_DIRS = $(INC_DIR) $(LIB_DIR) $(OBJ_DIR)
 
 INCS = $(addprefix $(INC_DIR)/, $(HEADERS))
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRCS:.c=.o))
 LIB = $(LIB_DIR)/$(LIBRARY_NAME)
 
 default: $(REQUIRED_DIRS) $(OBJS) $(INCS) $(LIB)
-	
+
 COMPILE = $(CC) -fPIC $(LDFLAGS) $(CFLAGS) $(CPPFLAGS) $(CFLAGS_EXTRA)
 
 $(REQUIRED_DIRS):
@@ -37,7 +37,7 @@ $(INCS): $(INC_DIR)
 $(LIB): $(LIB_DIR)
 	ar rc $(LIB) $(OBJS)
 
-clean: 
+clean:
 	rm -rf $(REQUIRED_DIRS)
 	rm -rf $(LIB_BASE_DIR)
 

@@ -1,12 +1,12 @@
 # C-Utils
 
-A collection of common utility files for C projects. This project aims to 
-improve consistency between repositories and having a straightforward build 
+A collection of common utility files for C projects. This project aims to
+improve consistency between repositories and having a straightforward build
 system allowing it to be used with and without conjunction with the epics build
-system. 
+system.
 
 
-## Library Components 
+## Library Components
 
 
 | File (.c/.h)  | Description | Dependencies (.c/.h) |
@@ -16,30 +16,30 @@ system.
 | buffered_file | Buffered interface for reading/writing to a socket | common, error |
 | hashtable     | Hashtable implimentation | common |
 | locking       | Helper functions for interations with mutex's | common, error |
-| parse         | Simple parsing support | common, error | 
+| parse         | Simple parsing support | common, error |
 
 
 ## Build
 
-### Default ( linux-x86_64 ) 
+### Default ( linux-x86_64 )
 ```bash
 make
 ```
 
 To compile for other architectures:
 ```bash
-make CC="/path/to/c-compiler" ARCH="<your architecture>" 
+make CC="/path/to/c-compiler" ARCH="<your architecture>"
 ```
 
 ## How to include in your project
 
 ### Optional Add Makefile.extra
 
-Makefile.extra is a compilation of linker and compiler flags. Add to src 
+Makefile.extra is a compilation of linker and compiler flags. Add to src
 makefiles to include
 ```
 include /path/to/this/directory/src/Makefile.extra
-``` 
+```
 
 ### EPICS Project
 
@@ -59,16 +59,16 @@ USR_CPPFLAGS += $(CPPFLAGS)
 USR_LDFLAGS += $(LDFLAGS)
 ```
 
-### Other Projects 
+### Other Projects
 
-Include as you would another library. 
+Include as you would another library.
 
 1) Add the following flags to your compile command.
 ```
--I</path/to/this/directory>/include 
+-I</path/to/this/directory>/include
 -L</path/to/this/directory>/lib/<target-architecture>
 -lc-utils
 ```
 
-2) If including Makefile.extra, add ` $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) ` to 
+2) If including Makefile.extra, add ` $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) ` to
 compile command.

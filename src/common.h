@@ -106,7 +106,7 @@ void start_logging(const char *ident);
         (type *)((void *) mptr - offsetof(type, member)); \
     } )
 #define container_of(args...)   _id_container_of(UNIQUE_ID(), args)
-        
+
 
 /* Debug utility for dumping binary data in ASCII format. */
 void dump_binary(FILE *out, const void *buffer, size_t length);

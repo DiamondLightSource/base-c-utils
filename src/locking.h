@@ -78,4 +78,4 @@ bool pwait_deadline(
 void compute_deadline(
     const struct timespec *timeout, clockid_t clock_id, struct timespec *deadline);
 
-#endif 
+#endif
