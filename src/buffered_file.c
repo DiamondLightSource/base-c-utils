@@ -63,7 +63,7 @@ static void send_entire_buffer(
 
 /* Writes out the entire output buffer, retrying as necessary to ensure it's all
  * gone. */
-bool flush_out_buf(struct buffered_file *file)
+bool bf_flush_out(struct buffered_file *file)
 {
     send_entire_buffer(file, file->out_buf, file->out_length);
     file->out_length = 0;
@@ -91,7 +91,7 @@ static void fill_in_buf(struct buffered_file *file)
  * an error was encountered first.  We also flush the out buffer if the buffer
  * needs filling so that the other side of the conversation has a chance to keep
  * up. */
-bool read_line(
+bool bf_read_line(
     struct buffered_file *file, char line[], size_t line_size, bool flush)
 {
     while (!file->eof  &&  !file->error)
@@ -136,7 +136,7 @@ bool read_line(
 
 /* This reads a fixed size block of data, returns false if the entire block
  * cannot be read for any reason. */
-bool read_block(struct buffered_file *file, char data[], size_t length)
+bool bf_read_block(struct buffered_file *file, char data[], size_t length)
 {
     while (!file->eof  &&  !file->error  &&  length > 0)
     {
@@ -156,7 +156,7 @@ bool read_block(struct buffered_file *file, char data[], size_t length)
 
 /* Writes a character array to the output buffer, flushing it to make room if
  * needed. */
-bool write_string(
+bool bf_write_string(
     struct buffered_file *file, const char string[], size_t length)
 {
     while (!file->error  &&  length > 0)
@@ -176,7 +176,7 @@ bool write_string(
 }
 
 
-bool write_formatted_string(
+bool bf_write_formatted_string(
     struct buffered_file *file, const char *format, ...)
 {
     if (file->error)
@@ -214,7 +214,7 @@ bool write_formatted_string(
 }
 
 
-bool write_block(struct buffered_file *file, const void *buffer, size_t length)
+bool bf_write_block(struct buffered_file *file, const void *buffer, size_t length)
 {
     flush_out_buf(file);
     send_entire_buffer(file, buffer, length);
@@ -224,7 +224,7 @@ bool write_block(struct buffered_file *file, const void *buffer, size_t length)
 
 /* As we guarantee that there's always room for one character in the output
  * buffer (we always flush when full) this function can be quite simple. */
-bool write_char(struct buffered_file *file, char ch)
+bool bf_write_char(struct buffered_file *file, char ch)
 {
     if (!file->error)
     {
@@ -239,7 +239,7 @@ bool write_char(struct buffered_file *file, char ch)
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-struct buffered_file *create_buffered_file(
+struct buffered_file *bf_create_file(
     int sock, size_t in_buf_size, size_t out_buf_size)
 {
     struct buffered_file *file = malloc(sizeof(struct buffered_file));
@@ -253,7 +253,7 @@ struct buffered_file *create_buffered_file(
     return file;
 }
 
-error__t destroy_buffered_file(struct buffered_file *file)
+error__t bf_destroy_file(struct buffered_file *file)
 {
     error__t error = file->error;
     free(file->in_buf);
@@ -262,7 +262,7 @@ error__t destroy_buffered_file(struct buffered_file *file)
     return error;
 }
 
-bool check_buffered_file(struct buffered_file *file)
+bool bf_check_file(struct buffered_file *file)
 {
     return !file->error;
 }

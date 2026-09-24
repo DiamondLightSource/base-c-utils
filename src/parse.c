@@ -32,7 +32,6 @@ size_t read_whitespace(const char **string)
     return strlen(start) - strlen(*string);
 }
 
-/* Expects whitespace and skips it. */
 error__t parse_whitespace(const char **string, bool optional)
 {
     bool found = read_whitespace(string);

@@ -31,17 +31,17 @@ To compile for other architectures:
 make CC="/path/to/c-compiler" ARCH="<your architecture>"
 ```
 
-## How to include in your project
+## How to include in a project
 
 ### Optional Add Makefile.extra
 
-Makefile.extra is a compilation of linker and compiler flags. Add to src
-makefiles to include
+Makefile.extra is a collection of linker and compiler flags.
 ```
 include /path/to/this/directory/src/Makefile.extra
 ```
+Add to any makefiles to include these flags.
 
-### EPICS Project
+### EPICS IOC
 
 1) Add this line to configure/RELEASE
 ```
@@ -70,5 +70,5 @@ Include as you would another library.
 -lc-utils
 ```
 
-2) If including Makefile.extra, add ` $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) ` to
+2) If including Makefile.extra, add `$(CFLAGS) $(CPPFLAGS) $(LDFLAGS) ` to the
 compile command.
