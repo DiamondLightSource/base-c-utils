@@ -26,7 +26,7 @@ void pwait_initialise(pthread_cond_t *signal)
 
 
 void compute_deadline(
-    const struct timespec *timeout, clockid_t clock_id, 
+    const struct timespec *timeout, clockid_t clock_id,
     struct timespec *deadline)
 {
     ASSERT_IO(clock_gettime(clock_id, deadline));

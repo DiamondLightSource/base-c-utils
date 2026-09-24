@@ -9,7 +9,7 @@ SRC_DIR = $(TOP)/src
 ARCH ?= linux-x86_64
 CC ?= $(CC)
 
-build: 
+build:
 	$(MAKE) -C $(SRC_DIR) CC=$(CC) ARCH=$(ARCH) TOP=$(TOP)
 
 # ------------------------------------------------------------------------------

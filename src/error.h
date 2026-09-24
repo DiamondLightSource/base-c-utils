@@ -33,7 +33,7 @@
  *  TEST_IO      TEST_IO_      ASSERT_IO       Fail if expression is -1
  *  TEST_OK_IO   TEST_OK_IO_   ASSERT_OK_IO    Fail if false, reports errno
  *  TEST_PTHREAD TEST_PTHREAD_ ASSERT_PTHREAD  Fail if expression is not 0
- * 
+ *
  * The three patterns behave thus:
  *
  *  TEST_xx(expr)
@@ -142,7 +142,7 @@ const char *error_format(error__t error);
 /* Called to report unrecoverable error.  Terminates program without return. */
 void _error_panic(char *extra, const char *filename, int line)
     __attribute__((__noreturn__));
-    
+
 /* Performs normal error report. */
 error__t _error_create(char *extra, const char *format, ...)
     __attribute__((format(printf, 2, 3)));
@@ -257,4 +257,4 @@ char *_error_extra_io_errno(int error);
     })
 #define DO_FINALLY(args...) _id_DO_FINALLY(UNIQUE_ID(), args)
 
-#endif 
+#endif
