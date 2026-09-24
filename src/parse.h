@@ -4,8 +4,12 @@
 #ifndef _PARSE_H
 #define _PARSE_H 1
 
-/* Incements *string to first non space character in string. */
+/* Increments *string to first non space character in string. */
 void skip_whitespace(const char **string);
+
+/* Increments *string to first non space character in string. Returns number of
+ * whitespace characters seen. */
+size_t read_whitespace(const char **string);
 
 /* Advances *string past whitespace, fails with error if no whitespace found and
  * optional flag not set. */
@@ -62,9 +66,29 @@ error__t parse_bit(const char **string, bool *result);
 /* Checks for end of input string. */
 error__t parse_eos(const char **string);
 
-/* Parses an array of uints32_ts from string. */
-error__t parse_uint32_array(
+/* Parses an array of uint32s of unknown length from string into result. Counts
+ * the number of entries in length. Will stop at first non digit character.
+ * Returns an error if more than max_length continuous uint32s are present. */
+error__t parse_uint32_array_(
     const char **string, size_t *length, uint32_t result[], size_t max_length);
+
+/* Parses an array of unsigned integers of unknown length from string into
+ * result. Counts the number of entries in length. Will stop at first non digit
+ * character. Returns an error if more than max_length continuous unsigned
+ * integers are present. */
+error__t parse_uint_array_(
+    const char **string, size_t *length, unsigned int result[], size_t max_length);
+
+/* Parses an array of length uint32s from string into result. Returns
+ * an error if length uint32s are not found. */
+error__t parse_uint32_array(
+    const char **string, unsigned int result[], size_t length);
+
+/* Parses an array of length unsinged integers from string into result. Returns
+ * an error if length unsigned integers are not found. */
+error__t parse_uint_array(
+    const char **string, unsigned int result[], size_t length);
+
 
 /* Write a max of length bytes of the formatted string to *result and increments
  * the string */
@@ -73,6 +97,8 @@ error__t __attribute__((format(printf, 3, 4))) format_string(
 
 error__t __attribute__((format(printf, 3, 4))) format_string_(
     char *result, size_t length, const char *format, ...);
+
+error__t format_double(char *result, size_t length, double value);
 
 /* Writes a max of length bytes to *result from value and stores the number of
  * entries in count. */

@@ -257,20 +257,4 @@ char *_error_extra_io_errno(int error);
     })
 #define DO_FINALLY(args...) _id_DO_FINALLY(UNIQUE_ID(), args)
 
-/* Wrapper around mutex lock/unlock.  The unlock call does not need to be
- * checked as the only valid return code (EPERM) does not apply. */
-#define WITH_MUTEX(mutex) \
-    _WITH_ENTER_LEAVE( \
-        ASSERT_PTHREAD(pthread_mutex_lock(&mutex)), \
-        pthread_mutex_unlock(&mutex))
-
-/* Wraps a mutex call around the calculation of error, returns the error code
- * result. */
-#define ERROR_WITH_MUTEX(mutex, error) \
-    ( \
-        ASSERT_PTHREAD(pthread_mutex_lock(&mutex)), \
-        DO_FINALLY(error, \
-            pthread_mutex_unlock(&mutex)) \
-    )
-
 #endif 

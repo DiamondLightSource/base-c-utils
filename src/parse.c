@@ -15,7 +15,6 @@
 #include "parse.h"
 
 
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /* Simple parsing support. */
 
@@ -26,13 +25,18 @@ void skip_whitespace(const char **string)
         *string += 1;
 }
 
+size_t read_whitespace(const char **string)
+{
+    const char *start = *string;
+    skip_whitespace(string);
+    return strlen(start) - strlen(*string);
+}
 
 /* Expects whitespace and skips it. */
 error__t parse_whitespace(const char **string, bool optional)
 {
-    const char *start = *string;
-    skip_whitespace(string);
-    return TEST_OK_(optional || *string > start, "Whitespace expected");
+    bool found = read_whitespace(string);
+    return TEST_OK_(optional || found, "Whitespace expected");
 }
 
 
@@ -179,19 +183,65 @@ error__t parse_eos(const char **string)
     return TEST_OK_(**string == '\0', "Unexpected character after input");
 }
 
-error__t parse_uint32_array(
+error__t parse_uint32_array_(
     const char **string, size_t *count, uint32_t result[], size_t max_length)
 {
     error__t error = ERROR_OK;
-    while (!error && !(**string == '\0')) {
-        skip_whitespace(string) ;
+    skip_whitespace(string);
+    while (!error && isdigit(**string)) {
         error =
             TEST_OK_(*count < max_length, "Too many values") ?:
-            parse_uint32(string, &(result[*count])) ;
-        (*count)++;
+            parse_uint32(string, &(result[*count])) ?:
+            DO((*count)++)  ?:
+            parse_whitespace(string, false);
     }
     return error;
 }
+
+
+error__t parse_uint_array_(
+    const char **string, size_t *count, unsigned int result[], size_t max_length)
+{
+    error__t error = ERROR_OK;
+    skip_whitespace(string);
+    while (!error && isdigit(**string)) {
+        error =
+            TEST_OK_(*count < max_length, "Too many values") ?:
+            parse_uint(string, &(result[*count]))  ?:
+            DO((*count)++)  ?:
+            parse_whitespace(string, true);
+    }
+    return error;
+}
+
+
+error__t parse_uint32_array(
+    const char **string, unsigned int array[], size_t length)
+{
+    size_t count = 0;
+    /* We dont care about the error raised from parsing length number of
+     * elements, only if it failed early.  */
+    error_discard(parse_uint32_array_(string, &count, array, length));
+    if (count == length)
+        return ERROR_OK;
+    else
+        return FAIL_("Failed to parse uint array");
+}
+
+
+error__t parse_uint_array(
+    const char **string, unsigned int array[], size_t length)
+{
+    size_t count = 0;
+    /* We dont care about the error raised from parsing length number of
+     * elements, only if it failed early.  */
+    error_discard(parse_uint_array_(string, &count, array, length));
+    if (count == length)
+        return ERROR_OK;
+    else
+        return FAIL_("Failed to parse uint array");
+}
+
 
 
 /* ************************************************************************* */
@@ -224,6 +274,24 @@ error__t __attribute__((format(printf, 3, 4))) format_string_(
         "Result too long");
 }
 
+/* Alas the double formatting rules are ill mannered, in particular I don't want
+ * to allow leading spaces.  I'd also love to prune trailing zeros, but we'll
+ * see. */
+error__t format_double(char *result, size_t length, double value)
+{
+    error__t error = format_string_(result, length, "%.10g", value);
+    if (!error)
+    {
+        const char *formatted_string = result;
+        size_t num_whitespaces = read_whitespace(&formatted_string);
+        result += num_whitespaces;
+
+        // if (num_whitespaces)
+            // memmove(result, result + num_whitespaces,
+                // strlen(result) - num_whitespaces);
+    }
+    return error;
+}
 error__t format_uint32_array(
     char **result, size_t *length, const uint32_t value[], size_t count)
 {
@@ -232,3 +300,4 @@ error__t format_uint32_array(
         error = format_string(result, length, " %u", value[i]);
     return error;
 }
+
