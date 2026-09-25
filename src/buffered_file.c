@@ -126,7 +126,7 @@ bool bf_read_line(
         line_size -= data_avail;
 
         if (flush)
-            flush_out_buf(file);
+            bf_flush_out(file);
         flush = false;
         fill_in_buf(file);
     }
@@ -170,7 +170,7 @@ bool bf_write_string(
 
         /* If out_buf is full, send it. */
         if (file->out_length >= file->out_buf_size)  // Only == is possible!
-            flush_out_buf(file);
+            bf_flush_out(file);
     }
     return !file->error;
 }
@@ -197,7 +197,7 @@ bool bf_write_formatted_string(
     else
     {
         /* Not enough room.  Flush the buffer and try again. */
-        if (flush_out_buf(file))
+        if (bf_flush_out(file))
         {
             va_start(args, format);
             file->out_length = (size_t) vsnprintf(
@@ -216,7 +216,7 @@ bool bf_write_formatted_string(
 
 bool bf_write_block(struct buffered_file *file, const void *buffer, size_t length)
 {
-    flush_out_buf(file);
+    bf_flush_out(file);
     send_entire_buffer(file, buffer, length);
     return !file->error;
 }
@@ -230,7 +230,7 @@ bool bf_write_char(struct buffered_file *file, char ch)
     {
         file->out_buf[file->out_length++] = ch;
         if (file->out_length >= file->out_buf_size)
-            flush_out_buf(file);
+            bf_flush_out(file);
     }
     return !file->error;
 }
