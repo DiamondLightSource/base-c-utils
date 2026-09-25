@@ -67,28 +67,37 @@ error__t parse_bit(const char **string, bool *result);
 error__t parse_eos(const char **string);
 
 /* Parses an array of uint32s of unknown length from string into result. Counts
- * the number of entries in length. Will stop at first non digit character.
- * Returns an error if more than max_length continuous uint32s are present. */
+ * the number of entries in length. Returns an error if more than max_length
+ * uint32s are present. */
 error__t parse_uint32_array_(
     const char **string, size_t *length, uint32_t result[], size_t max_length);
 
 /* Parses an array of unsigned integers of unknown length from string into
- * result. Counts the number of entries in length. Will stop at first non digit
- * character. Returns an error if more than max_length continuous unsigned
- * integers are present. */
+ * result. Counts the number of entries in length. Returns an error if more than
+ * max_length unsigned integers are present. */
 error__t parse_uint_array_(
     const char **string, size_t *length, unsigned int result[], size_t max_length);
 
-/* Parses an array of length uint32s from string into result. Returns
- * an error if length uint32s are not found. */
+/* Parses an array of doubles of unknown length from string into
+ * result. Counts the number of entries in length. Returns an error if more than
+ * max_length doubles are present. */
+error__t parse_double_array_(
+    const char **string, size_t *length, double result[], size_t max_length);
+
+/* Parses an array of length uint32s from string into result. Returns an error
+ * if length uint32s are not found in string. */
 error__t parse_uint32_array(
     const char **string, unsigned int result[], size_t length);
 
 /* Parses an array of length unsinged integers from string into result. Returns
- * an error if length unsigned integers are not found. */
+ * an error if length unsigned integers are not found in string. */
 error__t parse_uint_array(
     const char **string, unsigned int result[], size_t length);
 
+/* Parses an array of length doubles from string into result. Returns
+ * an error if length doubles are not found in string. */
+error__t parse_double_array(
+       const char **string, double result[], size_t length);
 
 /* Write a max of length bytes of the formatted string to *result and increments
  * the string */

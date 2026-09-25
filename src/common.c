@@ -39,7 +39,7 @@ void start_logging(const char *ident)
 static void print_timestamp(struct timespec *timestamp)
 {
     /* Convert ns into microseconds, the extra ns detail is a bit much. */
-    long usec = (timestamp->tv_nsec + 500) / 1000;
+    uint32_t usec = (uint32_t) (timestamp->tv_nsec + 500) / 1000;
     if (usec >= 1000000)
     {
         usec -= 1000000;
@@ -50,7 +50,7 @@ static void print_timestamp(struct timespec *timestamp)
     struct tm tm;
     localtime_r(&timestamp->tv_sec, &tm);
 
-    fprintf(stderr, "%04d-%02d-%02d %02d:%02d:%02d.%06ld: ",
+    fprintf(stderr, "%04d-%02d-%02d %02d:%02d:%02d.%06u: ",
         1900 + tm.tm_year, tm.tm_mon + 1, tm.tm_mday,
         tm.tm_hour, tm.tm_min, tm.tm_sec, usec);
 }

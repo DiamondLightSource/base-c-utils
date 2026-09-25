@@ -188,11 +188,15 @@ error__t parse_eos(const char **string)
         type result[], size_t max_length) \
     { \
         error__t error = ERROR_OK;  \
-        for (size_t i = 0; !error && isdigit(**string); i++) {  \
+        skip_whitespace(string); \
+        while(!error && **string != '\0') {  \
             error =  \
                 TEST_OK_(*count < max_length, "Too many values") ?:  \
-                convert(string, &(result[*count])) ?:  \
-                DO((*count)++)  ?:  \
+                IF_ELSE(isdigit(**string), \
+                    convert(string, &(result[*count])) ?:  \
+                    DO((*count)++), \
+                /* Else */ \
+                    DO(*string = *string + 1))  ?:  \
                 parse_whitespace(string, true);  \
         }  \
         return error;  \
@@ -207,9 +211,10 @@ DEFINE_PARSE_ARRAY_(double, double, parse_double)
         const char **string, type array[], size_t length) \
     { \
         size_t count = 0; \
-        /* We dont care about the error raised from parsing length number of \
-        * elements, only if it failed early.  */ \
+        /* We don't want to return the value for having too many values if we
+         * only want a select few */ \
         error_discard(parse_##name##_array_(string, &count, array, length)); \
+        printf("Count = %u\n", count); \
         if (count == length) \
             return ERROR_OK; \
         else \
