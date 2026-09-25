@@ -183,48 +183,22 @@ error__t parse_eos(const char **string)
 }
 
 
-#define DEFINE_PARSE_ARRAY_(name, type, convert) \
-    error__t parse_##name##_array_(const char **string, size_t *count, \
-        type result[], size_t max_length) \
+#define DEFINE_PARSE_ARRAY(name, type, convert) \
+    error__t parse_##name##_array( \
+        const char **string, size_t *count, type result[], size_t max_length) \
     { \
-        error__t error = ERROR_OK;  \
-        skip_whitespace(string); \
-        while(!error && **string != '\0') {  \
-            error =  \
-                TEST_OK_(*count < max_length, "Too many values") ?:  \
-                IF_ELSE(isdigit(**string), \
-                    convert(string, &(result[*count])) ?:  \
-                    DO((*count)++), \
-                /* Else */ \
-                    DO(*string = *string + 1))  ?:  \
-                parse_whitespace(string, true);  \
-        }  \
+        error__t error = ERROR_OK; \
+        for (size_t i = 0; !error && i < max_length && **string != '\0'; i++) \
+            error = \
+                IF(i > 0, parse_whitespace(string, true)) ?: \
+                convert(string, &result[i]) ?: \
+                DO(*count += 1); \
         return error;  \
     }
 
-DEFINE_PARSE_ARRAY_(uint32, uint32_t, parse_uint32)
-DEFINE_PARSE_ARRAY_(uint, unsigned int, parse_uint)
-DEFINE_PARSE_ARRAY_(double, double, parse_double)
-
-#define DEFINE_PARSE_ARRAY(name, type) \
-    error__t parse_##name##_array( \
-        const char **string, type array[], size_t length) \
-    { \
-        size_t count = 0; \
-        /* We don't want to return the value for having too many values if we
-         * only want a select few */ \
-        error_discard(parse_##name##_array_(string, &count, array, length)); \
-        printf("Count = %u\n", count); \
-        if (count == length) \
-            return ERROR_OK; \
-        else \
-            return FAIL_("Failed to parse " #name " array"); \
-    } \
-
-DEFINE_PARSE_ARRAY(uint32, uint32_t)
-DEFINE_PARSE_ARRAY(uint, unsigned int)
-DEFINE_PARSE_ARRAY(double, double)
-
+DEFINE_PARSE_ARRAY(uint32, uint32_t, parse_uint32)
+DEFINE_PARSE_ARRAY(uint, unsigned int, parse_uint)
+DEFINE_PARSE_ARRAY(double, double, parse_double)
 
 /* ************************************************************************* */
 /* Insert Functions*/
