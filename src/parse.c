@@ -182,65 +182,43 @@ error__t parse_eos(const char **string)
     return TEST_OK_(**string == '\0', "Unexpected character after input");
 }
 
-error__t parse_uint32_array_(
-    const char **string, size_t *count, uint32_t result[], size_t max_length)
-{
-    error__t error = ERROR_OK;
-    skip_whitespace(string);
-    while (!error && isdigit(**string)) {
-        error =
-            TEST_OK_(*count < max_length, "Too many values") ?:
-            parse_uint32(string, &(result[*count])) ?:
-            DO((*count)++)  ?:
-            parse_whitespace(string, false);
+
+#define DEFINE_PARSE_ARRAY_(name, type, convert) \
+    error__t parse_##name##_array_(const char **string, size_t *count, \
+        type result[], size_t max_length) \
+    { \
+        error__t error = ERROR_OK;  \
+        for (size_t i = 0; !error && isdigit(**string); i++) {  \
+            error =  \
+                TEST_OK_(*count < max_length, "Too many values") ?:  \
+                convert(string, &(result[*count])) ?:  \
+                DO((*count)++)  ?:  \
+                parse_whitespace(string, true);  \
+        }  \
+        return error;  \
     }
-    return error;
-}
 
+DEFINE_PARSE_ARRAY_(uint32, uint32_t, parse_uint32)
+DEFINE_PARSE_ARRAY_(uint, unsigned int, parse_uint)
+DEFINE_PARSE_ARRAY_(double, double, parse_double)
 
-error__t parse_uint_array_(
-    const char **string, size_t *count, unsigned int result[], size_t max_length)
-{
-    error__t error = ERROR_OK;
-    skip_whitespace(string);
-    while (!error && isdigit(**string)) {
-        error =
-            TEST_OK_(*count < max_length, "Too many values") ?:
-            parse_uint(string, &(result[*count]))  ?:
-            DO((*count)++)  ?:
-            parse_whitespace(string, true);
-    }
-    return error;
-}
+#define DEFINE_PARSE_ARRAY(name, type) \
+    error__t parse_##name##_array( \
+        const char **string, type array[], size_t length) \
+    { \
+        size_t count = 0; \
+        /* We dont care about the error raised from parsing length number of \
+        * elements, only if it failed early.  */ \
+        error_discard(parse_##name##_array_(string, &count, array, length)); \
+        if (count == length) \
+            return ERROR_OK; \
+        else \
+            return FAIL_("Failed to parse " #name " array"); \
+    } \
 
-
-error__t parse_uint32_array(
-    const char **string, unsigned int array[], size_t length)
-{
-    size_t count = 0;
-    /* We dont care about the error raised from parsing length number of
-     * elements, only if it failed early.  */
-    error_discard(parse_uint32_array_(string, &count, array, length));
-    if (count == length)
-        return ERROR_OK;
-    else
-        return FAIL_("Failed to parse uint array");
-}
-
-
-error__t parse_uint_array(
-    const char **string, unsigned int array[], size_t length)
-{
-    size_t count = 0;
-    /* We dont care about the error raised from parsing length number of
-     * elements, only if it failed early.  */
-    error_discard(parse_uint_array_(string, &count, array, length));
-    if (count == length)
-        return ERROR_OK;
-    else
-        return FAIL_("Failed to parse uint array");
-}
-
+DEFINE_PARSE_ARRAY(uint32, uint32_t)
+DEFINE_PARSE_ARRAY(uint, unsigned int)
+DEFINE_PARSE_ARRAY(double, double)
 
 
 /* ************************************************************************* */
