@@ -235,19 +235,12 @@ error__t __attribute__((format(printf, 3, 4))) format_string_(
  * see. */
 error__t format_double(char *result, size_t length, double value)
 {
-    error__t error = format_string_(result, length, "%.10g", value);
-    if (!error)
-    {
-        const char *formatted_string = result;
-        size_t num_whitespaces = read_whitespace(&formatted_string);
-        result += num_whitespaces;
-
-        // if (num_whitespaces)
-            // memmove(result, result + num_whitespaces,
-                // strlen(result) - num_whitespaces);
-    }
-    return error;
+    return
+        format_string_(result, length, "%.10g", value)  ?:
+        DO(skip_whitespace(&result));
 }
+
+
 error__t format_uint32_array(
     char **result, size_t *length, const uint32_t value[], size_t count)
 {
