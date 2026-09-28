@@ -190,7 +190,7 @@ error__t parse_eos(const char **string)
         error__t error = ERROR_OK; \
         for (size_t i = 0; !error && i < max_length && **string != '\0'; i++) \
             error = \
-                IF(i > 0, parse_whitespace(string, true)) ?: \
+                IF(i > 0, parse_whitespace(string, false)) ?: \
                 convert(string, &result[i]) ?: \
                 DO(*count += 1); \
         return error;  \
