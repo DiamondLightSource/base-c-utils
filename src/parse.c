@@ -241,10 +241,6 @@ error__t format_double(char *result, size_t length, double value)
         const char *formatted_string = result;
         size_t num_whitespaces = read_whitespace(&formatted_string);
         result += num_whitespaces;
-
-        // if (num_whitespaces)
-            // memmove(result, result + num_whitespaces,
-                // strlen(result) - num_whitespaces);
     }
     return error;
 }
