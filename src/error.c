@@ -166,4 +166,3 @@ void _error_panic(char *extra, const char *filename, int line)
 
     _exit(255);
 }
-

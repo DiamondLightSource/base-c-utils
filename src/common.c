@@ -129,4 +129,3 @@ void dump_binary(FILE *out, const void *buffer, size_t length)
         fprintf(out, "\n");
     }
 }
-

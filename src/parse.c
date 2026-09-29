@@ -244,6 +244,7 @@ error__t format_double(char *result, size_t length, double value)
     }
     return error;
 }
+
 error__t format_uint32_array(
     char **result, size_t *length, const uint32_t value[], size_t count)
 {
@@ -252,4 +253,3 @@ error__t format_uint32_array(
         error = format_string(result, length, " %u", value[i]);
     return error;
 }
-
