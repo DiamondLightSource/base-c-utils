@@ -65,7 +65,7 @@ void start_logging(const char *ident);
 /* Use this to mark functions that can be constant folded, ie depend only on
  * their arguments and global state. */
 #define _pure __attribute__((pure))
-
+#define _const __attribute__((const))
 
 /* Casting from one type to another with checking via a union.  Needed in
  * particular to reassure the compiler about aliasing. */
