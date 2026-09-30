@@ -14,9 +14,10 @@ system.
 | common        | Common logging and common utility macros | None |
 | error         | Framework for handling and reporting errors. | common |
 | buffered_file | Buffered interface for reading/writing to a socket | common, error |
-| hashtable     | Hashtable implimentation | common |
+| hashtable     | Hashtable implementation | common |
 | locking       | Helper functions for interations with mutex's | common, error |
 | parse         | Simple parsing support | common, error |
+| Makefile.extra| Common compiler flags to be included in makefiles | None |
 
 
 ## Build
@@ -28,19 +29,11 @@ make
 
 To compile for other architectures:
 ```bash
-make CC="/path/to/c-compiler" ARCH="<your architecture>"
+make CC="/path/to/c-compiler" ARCH="<os>-<your architecture>"
 ```
 
 ## How to include in a project
 
-
-### Optional Add Makefile.extra
-
-Makefile.extra is a collection of linker and compiler flags.
-```
-include /path/to/this/directory/src/Makefile.extra
-```
-Add to any makefiles to include these flags.
 
 ### EPICS IOC
 
@@ -53,7 +46,6 @@ C-UTILS = /path/to/this/directory
 <your_project>_LIBS += c-utils
 ```
 
-
 ### Other Projects
 
 Include as you would another library.
@@ -61,7 +53,7 @@ Include as you would another library.
 1) Add the following flags to your compile command.
 ```
 -I</path/to/this/directory>/include
--L</path/to/this/directory>/lib/<target-architecture>
+-L</path/to/this/directory>/lib/<os>-<target-architecture>
 -lc-utils
 ```
 

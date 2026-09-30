@@ -38,7 +38,6 @@ $(LIB): $(LIB_DIR)
 	ar rc $(LIB) $(OBJS)
 
 clean:
-	rm -rf $(REQUIRED_DIRS)
-	rm -rf $(LIB_BASE_DIR)
+	rm -rf $(REQUIRED_DIRS) $(LIB_BASE_DIR)
 
 .DELETE_ON_ERROR:
