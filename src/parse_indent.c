@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <ctype.h>
 
+#include "common.h"
 #include "error.h"
 
 #include "parse.h"
@@ -73,10 +74,7 @@ static error__t close_indents(
 static error__t parse_one_line(
     const char **line, struct indent_state indent_stack[], unsigned int *sp)
 {
-    /* Find indent of the current line. */
-    const char *line_in = *line;
-    *line = skip_whitespace(*line);
-    size_t indent = (size_t) (*line - line_in);
+    size_t indent = read_whitespace(line);
 
     /* Ignore comments and blank lines. */
     error__t error = ERROR_OK;
