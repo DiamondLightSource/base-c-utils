@@ -132,7 +132,7 @@ void _error_extend(error__t error, const char *format, ...)
         if (unlikely(error)) _error_extend(error, extend); \
         error; \
     })
-#define error_extend(args...) _id_error_extend(UNIQUE_ID(), args)
+#define ERROR_EXTEND(args...) _id_error_extend(UNIQUE_ID(), args)
 
 
 /* Converts an error code into a formatted string. */
