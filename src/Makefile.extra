@@ -1,0 +1,44 @@
+# This file contains common makefile definitions and is designed to be included
+# into projects using this support module.
+
+# These flags ensure that debug information is available if required.
+CFLAGS += -g
+LDFLAGS += -g
+LDFLAGS += -rdynamic
+
+CPPFLAGS += -D_DEFAULT_SOURCE
+CPPFLAGS += -D_GNU_SOURCE
+
+CFLAGS += -std=gnu99
+CFLAGS += -Wall
+CFLAGS += -Wextra
+
+CFLAGS += -Wundef
+CFLAGS += -Wshadow
+CFLAGS += -Wcast-align
+CFLAGS += -Wwrite-strings
+CFLAGS += -Wredundant-decls
+CFLAGS += -Wmissing-prototypes
+CFLAGS += -Wmissing-declarations
+CFLAGS += -Wstrict-prototypes
+CFLAGS += -Wcast-qual
+CFLAGS += -Woverflow
+CFLAGS += -Wconversion
+
+CFLAGS += -fstrict-overflow
+CFLAGS += -Wsign-compare
+
+CFLAGS += -Wstrict-overflow=5
+
+CFLAGS += -Wno-switch-enum
+CFLAGS += -Wno-variadic-macros
+CFLAGS += -Wno-padded
+CFLAGS += -Wno-format-nonliteral
+CFLAGS += -Wno-vla
+CFLAGS += -Wno-c++-compat
+CFLAGS += -Wno-pointer-arith
+CFLAGS += -Wno-unused-parameter
+CFLAGS += -Wno-missing-field-initializers
+
+CFLAGS += -Wno-system-headers
+
