@@ -1,3 +1,12 @@
+# Local configuration
+/CONFIG
+
 lib
 include
 src/O.*
+
+# Python droppings
+__pycache__
+
+# Built documentation
+docs/html
