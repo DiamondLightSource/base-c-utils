@@ -1,6 +1,8 @@
 Error Handling Macros and Other Facilities
 ==========================================
 
+Must be included with ``common.h`` (see :doc:`common`).
+
 The header file ``error.h`` is designed to support a particular style of error
 handling.  The general approach is that functions which can fail should return a
 special :type:`error__t` return code, returning ``ERROR_OK`` if successful, and
@@ -208,18 +210,13 @@ managing error codes.
 
 ..  function:: bool error_report(error__t error)
 
-    Converts `error` into a string and uses :func:`log_error` to report the
-    error.  This is the normal destination for all error codes.  ``true`` is
+    Converts `error` into a string and uses :func:`log_error` from to report the
+    error.  This is the normal destination for all error codes. ``true`` is
     returned if `error` was an error (and an error message was reported), and
     ``false`` is returned if `error` is ``ERROR_OK``, in which case no action
     was taken.
 
     This function disposes of `error`, and this value is no longer valid.
-
-..  macro:: bool ERROR_REPORT(error, format...)
-
-    This helper macro will augment `error` with the message defined by
-    `format` before reporting the error by calling :func:`error_report`.
 
 ..  function:: bool error_discard(error__t error)
 
@@ -227,7 +224,7 @@ managing error codes.
     As for :func:`error_report`, ``true`` is returned if `error` was an error,
     and ``false`` if it was ``ERROR_OK``.
 
-..  macro:: error__t error_extend(error__t error, const char *format, ...)
+..  macro:: error__t _error_extend(error__t error, const char *format, ...)
 
     If `error` is not ``ERROR_OK`` then the information associated with `error`
     is augmented with the message defined by `format`.  The lifetime of `error`
@@ -243,174 +240,6 @@ managing error codes.
     Returns a formatted string representing the error code.  The lifetime of the
     returned string is identical to the lifetime of `error`, which must still be
     reported or discarded at the appropriate time.
-
-
-Message Logging Control
------------------------
-
-By default all error messages are sent to ``stderr``, but syslog can be used
-instead.
-
-..  function:: void vlog_message(int priority, const char *format, va_list args)
-
-    Sends the given message to ``stderr`` or to syslog, depending on whether
-    :func:`start_logging` has been called.
-
-..  function::
-    void log_message(const char *message, ...)
-    void log_error(const char *message, ...)
-
-    Calls :func:`vlog_message` with with `priority` set to ``LOG_INFO`` for
-    :func:`log_message`, and ``LOG_ERR`` for :func:`log_error`.
-
-    Note that :func:`error_report` uses :func:`log_error`.
-
-..  function:: void start_logging(const char *ident)
-
-    This invokes :func:`!openlog` (3) and sends all future messages to the
-    system log with the log identifier `ident`.
-
-
-Miscellaneous Helpers
----------------------
-
-These macros have no other natural home and have found their place in this
-header file.
-
-..  macro:: size_t ARRAY_SIZE(type array[])
-
-    If the number of elements of `array` is known at compile time this macro
-    returns the number of elements.
-
-..  macro:: to_type CAST_FROM_TO(from_type, to_type, value)
-
-    In some situations the compiler will not accept an ordinary C cast of the
-    form ``(type) value`` because of anxieties about aliasing, or if a ``const``
-    attribute needs to be removed, or if some other low level bit preserving
-    conversion is required.  This macro performs this cast in a more compiler
-    friendly manner (via a ``union`` type), and checks that `value` has type
-    `from_type` and that `to_type` and `value` have the same size.
-
-    For example, this macro is used to remove the ``const`` attribute from a
-    hashtable key in ``hashtable.c`` thus (here :func:`!release_key` takes a
-    ``void *`` argument)::
-
-        static void release_key(struct hash_table *table, const void *key)
-        {
-            table->key_ops->release_key(
-                CAST_FROM_TO(const void *, void *, key));
-        }
-
-    Another application is the following which extracts the bit pattern of a
-    floating point number as an integer::
-
-        uint32_t bit_pattern = CAST_FROM_TO(float, uint32_t, 0.1F);
-
-..  macro:: to_type CAST_TO(to_type, value)
-
-    This is a short-cut wrapper for :macro:`CAST_FROM_TO` for use in the case
-    when `from_type` is no more specific than ``typeof(value)``.
-
-..  macro:: type ENSURE_TYPE(type, value)
-
-    This is a weak cast from `value` to `type` which ensures that it is valid to
-    assign `value` to this `type`.  Note that this will not work if `type` is a
-    written out function type, in this case a typedef name would have to be
-    used.
-
-..  macro:: IGNORE(expr)
-
-    Discards a return value without compiler warning even when
-    ``warn_unused_result`` is in force.
-
-..  macro:: unlikely(expr)
-
-    Provides a hint to the compiler that ``expr`` is likely to be ``0``, can
-    help in the optimisation of very rarely taken branches.
-
-..  macro::
-    COMPILE_ASSERT(expr)
-    STATIC_COMPILE_ASSERT(expr)
-
-    This macro forces a compile time error if `expr` evaluates to ``false`` at
-    compile time.  :macro:`COMPILE_ASSERT` must be used inside a function
-    declaration, while :macro:`STATIC_COMPILE_ASSERT` must be used at the top
-    declaration level.
-
-..  macro::
-    MIN(x, y)
-    MAX(x, y)
-
-    Macro safe minimum and maximum functions.
-
-..  macro:: container_of(ptr, type, member)
-
-    Casts a member of a structure out to the containing structure.  For example,
-    given `py` constructed thus::
-
-        struct xy { int x, y; } xy;
-        int *py = &xy.y;
-
-    a pointer to `xy` can be reconstructed as::
-
-        struct xy *pxy = container_of(py, struct xy, y);
-
-..  macro:: _WITH_ENTER_LEAVE(enter, leave)
-
-    This macro is used to construct helper macros for wrapping enter and exit
-    code around a block.  Instances of this macro must be followed by a single
-    statement or a block of code in braces, and the `enter` and `leave` clauses
-    are used to bracket the code.  In other words, the following use of this
-    macro::
-
-        _WITH_ENTER_LEAVE(enter, leave)
-        {
-            statements;
-        }
-
-    is exactly equivalent to::
-
-        {
-            enter;
-            statements;
-            leave;
-        }
-
-    Note that the `enter` clause may include the declaration of a local
-    variable, the scope of which includes the statements following and the
-    `leave` clause.
-
-    ..  warning::
-
-        ``break`` and ``return`` must **not** be used to exit the statement
-        block guarded by :macro:`_WITH_ENTER_LEAVE` or any of its derivatives.
-        Using ``break`` will restart the block after reinvoking `enter`, and
-        using ``return`` will bypass `leave`.
-
-..  macro:: WITH_MUTEX(mutex)
-
-    This macro wraps the statement or block of code that follows with calls to
-    ``pthread_mutex_lock(&mutex)`` and ``pthread_mutex_unlock(&mutex)``.  The
-    locking call is checked for success and an assertion failure is raised if
-    an error is detected.
-
-    ..  warning::
-
-        Do **not** exit the guarded block with ``break`` or ``return``.
-
-..  macro:: WITH_MUTEX_UNCHECKED(mutex)
-
-    Similar to :macro:`WITH_MUTEX`, except that lock errors are ignored.
-
-    ..  warning::
-
-        Do **not** exit the guarded block with ``break`` or ``return``.
-
-..  macro:: error__t ERROR_WITH_MUTEX(mutex, error)
-
-    This wraps mutex locking around an error expression, and evaluates to the
-    result of evaluating `error` under the lock, which must be an expression of
-    type :type:`error__t`.
 
 
 Pitfalls

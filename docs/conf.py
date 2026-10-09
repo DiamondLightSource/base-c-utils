@@ -53,8 +53,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'EPICS Device'
-copyright = '2015, Michael Abbott'
+project = 'Base C Utils'
+copyright = '2026, Michael Abbott'
 
 # Use the Sphinx C domain for code documentation.
 primary_domain = 'c'

@@ -16,6 +16,19 @@ Standard C API
     Mutex type for thread synchronisation, available via ``#include
     <pthread.h>``.
 
+..  type:: pthread_cond_t
+
+    Conditional variable to lock a mutex for until a condition is met, available
+    via ``#include <pthread.h>``.
+
+..  type:: uint32_t
+
+    32 bit unsigned integer, available via ``#include <stdint.h``
+
+..  type:: uint64_t
+
+    64 bit unsigned integer, available via ``#include <stdint.h``
+
 ..  type:: struct timespec
 
     Timestamp structure available via ``#include <time.h>``.  Represents time in
