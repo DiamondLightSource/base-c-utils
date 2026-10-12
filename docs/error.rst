@@ -36,14 +36,14 @@ An example of this style of coding can be seen here::
     static error__t open_file(char *filename, FILE *file)
     {
         return
-            TEST_OK(filename != NULL)  ?: 
+            TEST_OK(filename != NULL)  ?:
             TEST_IO(file = fopen(filename, "r"))  ?:
             DO(log_message("File opened successfully"));
     }
 
-The function :func:`log_message` in the final line of this example does not 
+The function :func:`log_message` in the final line of this example does not
 return an :type:`error__t` error code, so the macros in this file also provide
-functions to convert functions of a more familiar form into the format 
+functions to convert functions of a more familiar form into the format
 described here.
 
 For example, the macro :func:`TEST_IO` takes as argument an expression (which
@@ -193,10 +193,10 @@ and an extra comment should be used to structure these, as shown below::
 
 ..  macro:: error__t _ERROR_WITH_ENTER_LEAVE(enter, leave)
 
-    This macro is used to wrap enter and exit code around a block. Instances 
+    This macro is used to wrap enter and exit code around a block. Instances
     of this macro must be followed by a single statement or a block of code in
     braces with a type of :type:`error__t`, and the `enter` and `leave` clauses
-    are used to bracket the code, returning any error information that is 
+    are used to bracket the code, returning any error information that is
     contained in the block. `leave` is called regardless if an error is
     encountered in the block or not. This macro can be used as follows::
 

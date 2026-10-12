@@ -15,7 +15,7 @@ Common Parse Functions
 
 Where applicable these functions use the standard C conversion functions for
 converting a string to the corresponding data type. For example
-:func:`parse_int` uses :manpage:`strtol(3)` for converting to a integer, and 
+:func:`parse_int` uses :manpage:`strtol(3)` for converting to a integer, and
 will stop parsing at the first non digit character found.
 
 ..  function:: error__t parse_whitespace(const char **string, bool optional)

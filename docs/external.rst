@@ -52,20 +52,3 @@ Standard C API
     Global (thread local) variable set by IO calls to report error status,
     available via ``#include <errno.h>``.
 
-EPICS API
----------
-
-..  c:function:: int iocInit(void)
-
-    EPICS function used to start the IOC.  This must be called to start the IOC
-    after publishing all PVs and loading all EPICS databases.
-
-..  c:function:: int iocsh(const char *script)
-
-    Interactive IOC shell.  This can optionally be called after :func:`iocInit`
-    with a startup script as the `script` argument, or with ``NULL`` to provide
-    an interactive shell for the IOC.  Returns -1 on error, 0 on success.
-
-..  c:macro:: initHookAtEnd
-
-    EPICS event triggered at the end of IOC initialisation.

@@ -65,9 +65,9 @@ locks use ``pthread_mutex_t``.
     error__t ERROR_WITH_MUTEX(mutex, error)
     error__t ERROR_WITH_MUTEX_R(rw_mutex, error)
 
-    This wraps mutex locking around an error expression using 
+    This wraps mutex locking around an error expression using
     :macro:`_ERROR_WITH_ENTER_LEAVE`, and evaluates to the result of evaluating
-    `error` under the lock, which must be an expression of type 
+    `error` under the lock, which must be an expression of type
     :type:`error__t`.
 
 Locking Functions

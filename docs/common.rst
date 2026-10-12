@@ -1,8 +1,8 @@
 Common Macro Definitions
 ========================
 
-The header ``common.h`` is the backbone of the other functionality in this 
-library. It is composed of logging functionality, frequently used helpful 
+The header ``common.h`` is the backbone of the other functionality in this
+library. It is composed of logging functionality, frequently used helpful
 macros and macros with no other natural home.
 
 Message Logging Control
@@ -32,7 +32,7 @@ instead by calling :func:`start_logging`.
 ..  function:: void timetamp_logging(bool timestamps)
 
     Add timestamps to all logged output. The output is in outputted in the
-	format: ``YYYY-MM-DD hh-mm-ss.usec``.
+    format: ``YYYY-MM-DD hh-mm-ss.usec``.
 
 ..  function:: void start_logging(const char *ident)
 
@@ -114,7 +114,7 @@ header file.
 
 ..  macro:: SQR(x)
 
-	Macro safe squaring function.
+    Macro safe squaring function.
 
 ..  macro:: container_of(ptr, type, member)
 
