@@ -204,7 +204,7 @@ and an extra comment should be used to structure these, as shown below::
         {
             statements;
         }
-    
+
     is exactly equivalent to::
 
         {
@@ -222,11 +222,11 @@ managing error codes.
 
 ..  function:: bool error_report(error__t error)
 
-    Converts `error` into a string and uses :func:`log_error` from to report the
-    error.  This is the normal destination for all error codes. ``true`` is
-    returned if `error` was an error (and an error message was reported), and
-    ``false`` is returned if `error` is ``ERROR_OK``, in which case no action
-    was taken.
+    Converts `error` into a string and uses :func:`log_error` from ``common.h``
+    to report the error.  This is the normal destination for all error codes.
+    ``true`` is returned if `error` was an error (and an error message was
+    reported), and ``false`` is returned if `error` is ``ERROR_OK``, in which
+    case no action was taken.
 
     This function disposes of `error`, and this value is no longer valid.
 
