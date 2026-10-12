@@ -77,18 +77,18 @@ locks use ``pthread_mutex_t``.
     raised if an error is detected. This macro is used as follows::
 
 
-       WITH_MUTEX(mutex)
-       {
-           statements;
-       }
+        WITH_MUTEX(mutex)
+        {
+            statements;
+        }
 
     is equivalent to::
 
-       {
-           _LOCK(mutex)
-           statements;
-           _UNLOCK(mutex)
-       }
+        {
+            _LOCK(mutex)
+            statements;
+            _UNLOCK(mutex)
+        }
 
     ..  warning::
 

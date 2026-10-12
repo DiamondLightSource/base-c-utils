@@ -1,15 +1,15 @@
 Common Macro Definitions
 ========================
 
-The header ``common.h`` is the backbone of the other functionality. It is
-composed of logging functionality, frequently used helpful macros and macros
-with no other natural home.
+The header ``common.h`` is the backbone of the other functionality in this 
+library. It is composed of logging functionality, frequently used helpful 
+macros and macros with no other natural home.
 
 Message Logging Control
 -----------------------
 
 By default all error messages are sent to ``stderr``, but syslog can be used
-instead.
+instead by calling :func:`start_logging`.
 
 ..  function:: void vlog_message(int priority, const char *format, va_list args)
 
@@ -130,21 +130,21 @@ header file.
 
 ..   macro:: FOR_DOWN_FROM(i, n)
 
-     Iterates through a loop backwards. Counts ``i`` down from ``n-1`` to 0. For
-     example::
+    Iterates through a loop backwards. Counts ``i`` down from ``n-1`` to 0. For
+    example::
 
-         FOR_DOWN_FROM(i, 10)
-         {
-            printf("%d ", i);
-         }
-         print("\n");
+        FOR_DOWN_FROM(i, 10)
+        {
+           printf("%d ", i);
+        }
+        print("\n");
 
-     Will print ``9 8 ... 2 1 0``.
+    Will print ``9 8 ... 2 1 0``.
 
 ..   macro:: type* CALLOC(type, nelm)
 
-     Type aware calloc. Functionally equivalent to
-     ``(type *)calloc(nelm * sizeof(type))``
+    Type aware calloc. Functionally equivalent to
+    ``(type *)calloc(nelm * sizeof(type))``
 
 
 Debug Helpers
@@ -152,4 +152,4 @@ Debug Helpers
 
 .. function:: void dump_binary(FILE *out, const void *buffer, size_t length)
 
-   Dumps binary data from buffer into ``out`` in ASCII format
+   Dumps binary data from buffer into ``out`` in ASCII format.

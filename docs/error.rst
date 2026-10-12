@@ -31,10 +31,9 @@ requirements:
     In particular, values of type :type:`error__t` must not be silently dropped
     as otherwise errors can go unreported and there will be a memory leak.
 
-An example of this style of coding can be seen in the first half of the
-implementation of :func:`!ioc_main` in ``examples/example_ioc/src/main.c``::
+An example of this style of coding can be seen here::
 
-    static error__t ioc_main(void)
+    static error__t main(void)
     {
         return
             initialise_epics_device()  ?:
