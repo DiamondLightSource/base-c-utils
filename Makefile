@@ -24,5 +24,5 @@ docs:
 
 
 clean:
-	$(MAKE) -C $(SRC_DIR) clean
+	$(MAKE) -C $(SRC_DIR) TOP=$(TOP) clean
 	$(MAKE) -C $(DOCS_DIR) clean
