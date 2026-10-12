@@ -147,6 +147,38 @@ header file.
     ``(type *)calloc(nelm * sizeof(type))``
 
 
+..  macro:: _WITH_ENTER_LEAVE(enter, leave)
+
+    This macro is used to construct helper macros for wrapping enter and exit
+    code around a block.  Instances of this macro must be followed by a single
+    statement or a block of code in braces, and the `enter` and `leave` clauses
+    are used to bracket the code.  In other words, the following use of this
+    macro::
+
+        _WITH_ENTER_LEAVE(enter, leave)
+        {
+            statements;
+        }
+
+    is exactly equivalent to::
+
+        {
+            enter;
+            statements;
+            leave;
+        }
+
+    Note that the `enter` clause may include the declaration of a local
+    variable, the scope of which includes the statements following and the
+    `leave` clause.
+
+    ..  warning::
+
+        ``break`` and ``return`` must **not** be used to exit the statement
+        block guarded by :macro:`_WITH_ENTER_LEAVE` or any of its derivatives.
+        Using ``break`` will restart the block after reinvoking `enter`, and
+        using ``return`` will bypass `leave`.
+
 Debug Helpers
 -------------
 

@@ -18,23 +18,6 @@
 #define _LOCKW(mutex)    ASSERT_PTHREAD(pthread_rwlock_wrlock(&(mutex)))
 #define _UNLOCKRW(mutex) ASSERT_PTHREAD(pthread_rwlock_unlock(&(mutex)))
 
-
-/* Tricksy code to wrap enter and leave functions around a block of code.  The
- * use of double for loops is so that the enter statement can contain a variable
- * declaration, which is then available to the leave statement and the body of
- * the block. */
-#define _id_WITH_ENTER_LEAVE(loop, enter, leave) \
-    for (bool loop = true; loop; ) \
-        for (enter; loop; loop = false, leave)
-#define _WITH_ENTER_LEAVE(enter, leave) \
-    _id_WITH_ENTER_LEAVE(UNIQUE_ID(), enter, leave)
-
-/* Similar wrapper for wrapping enter and leave around an error code.  Only
- * valid if action evaluates to an error__t. */
-#define _ERROR_WITH_ENTER_LEAVE(enter, leave, action) \
-    ( enter, DO_FINALLY(action, leave))
-
-
 /* Wrapper around mutex lock/unlock. */
 #define WITH_MUTEX(mutex)   _WITH_ENTER_LEAVE(_LOCK(mutex),  _UNLOCK(mutex))
 #define WITH_MUTEX_R(mutex) _WITH_ENTER_LEAVE(_LOCKR(mutex), _UNLOCKRW(mutex))

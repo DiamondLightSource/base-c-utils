@@ -33,27 +33,18 @@ requirements:
 
 An example of this style of coding can be seen here::
 
-    static error__t main(void)
+    static error__t open_file(char *filename, FILE *file)
     {
         return
-            initialise_epics_device()  ?:
-
-            initialise_example_pvs()  ?:
-            start_caRepeater()  ?:
-            hook_pv_logging("db/access.acf", 10)  ?:
-            load_persistent_state(
-                persistence_file, persistence_interval, false)  ?:
-
-            TEST_IO(dbLoadDatabase("dbd/example_ioc.dbd", NULL, NULL))  ?:
-            TEST_IO(example_ioc_registerRecordDeviceDriver(pdbbase))  ?:
-            load_database("db/example_ioc.db")  ?:
-            TEST_OK(iocInit() == 0);
+            TEST_OK(filename != NULL)  ?: 
+            TEST_IO(file = fopen(filename, "r"))  ?:
+            DO(log_message("File opened successfully"));
     }
 
-The second half of this example uses the error handling macros.  Not all
-functions are of the form described above returning an :type:`error__t` error
-code, so the macros in this file provide functions to convert functions of a
-more familiar form into the format described here.
+The function :func:`log_message` in the final line of this example does not 
+return an :type:`error__t` error code, so the macros in this file also provide
+functions to convert functions of a more familiar form into the format 
+described here.
 
 For example, the macro :func:`TEST_IO` takes as argument an expression (which
 may be an assignment) which following the usual system library calling
@@ -199,6 +190,28 @@ and an extra comment should be used to structure these, as shown below::
         action,
     //finally
         finally);
+
+..  macro:: error__t _ERROR_WITH_ENTER_LEAVE(enter, leave)
+
+    This macro is used to wrap enter and exit code around a block. Instances 
+    of this macro must be followed by a single statement or a block of code in
+    braces with a type of :type:`error__t`, and the `enter` and `leave` clauses
+    are used to bracket the code, returning any error information that is 
+    contained in the block. `leave` is called regardless if an error is
+    encountered in the block or not. This macro can be used as follows::
+
+        _ERROR_WITH_ENTER_LEAVE(enter, leave)
+        {
+            statements;
+        }
+    
+    is exactly equivalent to::
+
+        {
+            enter;
+            DO_FINALLY(statements, leave);
+        }
+
 
 
 Error Reporting and Management

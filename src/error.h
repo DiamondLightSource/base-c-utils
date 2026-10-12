@@ -257,4 +257,11 @@ char *_error_extra_io_errno(int error);
     })
 #define DO_FINALLY(args...) _id_DO_FINALLY(UNIQUE_ID(), args)
 
+
+/* Similar wrapper for wrapping enter and leave around an error code.  Only
+ * valid if action evaluates to an error__t. */
+#define _ERROR_WITH_ENTER_LEAVE(enter, leave, action) \
+    ( enter, DO_FINALLY(action, leave))
+
+    
 #endif
