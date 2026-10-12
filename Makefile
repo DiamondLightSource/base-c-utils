@@ -17,6 +17,8 @@ build:
 
 DOCS_DIR=$(TOP)/docs
 
+.PHONY: docs
+
 docs:
 	$(MAKE) -C $(DOCS_DIR)
 
