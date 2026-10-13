@@ -9,6 +9,10 @@ Documentation for Base C Utils
     common
     error
     hashtable
+    locking
+    parse
+    buffered_file
+    parse_indent
     external
 
 

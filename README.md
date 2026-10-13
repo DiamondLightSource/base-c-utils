@@ -6,7 +6,6 @@ system allowing it to be used with and without conjunction with the epics build
 system.
 
 
-
 ## Library Components
 
 | File (.c/.h)  | Description | Dependencies (.c/.h) |
@@ -17,6 +16,7 @@ system.
 | hashtable     | Hashtable implementation | common |
 | locking       | Helper functions for interations with mutex's | common, error |
 | parse         | Simple parsing support | common, error |
+| parse_indent  | Parsing a file wil data structured through indentation | common, error |
 | Makefile.extra| Common compiler flags to be included in makefiles | None |
 
 
@@ -59,3 +59,8 @@ Include as you would another library.
 
 2) If including Makefile.extra, add `$(CFLAGS) $(CPPFLAGS) $(LDFLAGS) ` to the
 compile command.
+
+### Documentation
+```
+make docs
+```

@@ -1,10 +1,6 @@
 # TOP = ..
 # 
 # export TOP
-# 
-# include $(TOP)/configure/RELEASE
-# include $(TOP)/configure/CONFIG_SITE
-# export EPICS_BASE
 
 include ../CONFIG
 

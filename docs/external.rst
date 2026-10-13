@@ -16,6 +16,19 @@ Standard C API
     Mutex type for thread synchronisation, available via ``#include
     <pthread.h>``.
 
+..  type:: pthread_cond_t
+
+    Conditional variable to lock a mutex for until a condition is met, available
+    via ``#include <pthread.h>``.
+
+..  type:: uint32_t
+
+    32 bit unsigned integer, available via ``#include <stdint.h``
+
+..  type:: uint64_t
+
+    64 bit unsigned integer, available via ``#include <stdint.h``
+
 ..  type:: struct timespec
 
     Timestamp structure available via ``#include <time.h>``.  Represents time in
@@ -39,20 +52,3 @@ Standard C API
     Global (thread local) variable set by IO calls to report error status,
     available via ``#include <errno.h>``.
 
-EPICS API
----------
-
-..  c:function:: int iocInit(void)
-
-    EPICS function used to start the IOC.  This must be called to start the IOC
-    after publishing all PVs and loading all EPICS databases.
-
-..  c:function:: int iocsh(const char *script)
-
-    Interactive IOC shell.  This can optionally be called after :func:`iocInit`
-    with a startup script as the `script` argument, or with ``NULL`` to provide
-    an interactive shell for the IOC.  Returns -1 on error, 0 on success.
-
-..  c:macro:: initHookAtEnd
-
-    EPICS event triggered at the end of IOC initialisation.
