@@ -1,6 +1,8 @@
 Generic Hash Table
 ==================
 
+This header is required to be included alongside ``common.h`` and ``error.h``.
+
 This is a reasonably high performance hash table implementation.  The API is
 provided in two layers: one layer specialised for storing strings, and a more
 abstract layer where the management of keys is under user specified control.

@@ -12,6 +12,7 @@ Documentation for Base C Utils
     locking
     parse
     buffered_file
+    parse_indent
     external
 
 

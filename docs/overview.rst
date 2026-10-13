@@ -12,6 +12,7 @@ chapters (the header files are listed roughly in the order they need to be
 ``locking.h``        :doc:`locking`
 ``parse.h``          :doc:`parse`
 ``buffered_file.h``  :doc:`buffered_file`
+``parse_indent.h``   :doc:`parse_indent`
 ===================  =====================
 
 :doc:`common`:
@@ -38,4 +39,9 @@ chapters (the header files are listed roughly in the order they need to be
 
 :doc:`buffered_file`:
     Buffered interfaced for IO operations also working on sockets.
+    Depends on :doc:`common` and :doc:`error`.
+
+:doc:`parse_indent`:
+    A module to aid in the parsing of files with information grouped though
+    levels of indentation.
     Depends on :doc:`common` and :doc:`error`.
