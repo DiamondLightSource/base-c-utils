@@ -1,61 +1,74 @@
-# C-Utils
+# Base-C-Utils
 
-A collection of common utility files for C projects. This project aims to
-improve consistency between repositories and having a straightforward build
-system allowing it to be used with and without conjunction with the epics build
-system.
-
+A collection of common utility files for C projects with no external
+dependencies. This project aims to improve consistency between repositories.
+This module does not provide a static library file information on how to include
+in a project see the [Build section](#Build).
 
 
 ## Library Components
 
-| File (.c/.h)  | Description | Dependencies (.c/.h) |
-| ------------  | ----------- | ------------ |
-| common        | Common logging and common utility macros | None |
-| error         | Framework for handling and reporting errors. | common |
-| buffered_file | Buffered interface for reading/writing to a socket | common, error |
-| hashtable     | Hashtable implementation | common |
-| locking       | Helper functions for interations with mutex's | common, error |
-| parse         | Simple parsing support | common, error |
-| Makefile.extra| Common compiler flags to be included in makefiles | None |
+| File (.c/.h)   | Description                                        | Dependencies (.c/.h) |
+| ------------   | -------------------------------------------------- | -------------------- |
+| common         | Common logging and common utility macros           | None                 |
+| error          | Framework for handling and reporting errors.       | common               |
+| buffered_file  | Buffered interface for reading/writing to a socket | common, error        |
+| hashtable      | Hashtable implementation                           | common               |
+| locking        | Helper functions for interations with mutex's      | common, error        |
+| parse          | Simple parsing support                             | common, error        |
+| Makefile.extra | Common compiler flags to be included in makefiles  | None                 |
 
 
 ## Build
 
-### Default ( linux-x86_64 )
-```bash
-make
+The library files in this project are not to be built here, instead these
+library files are to be used as source files and built inside of another
+project. This is done so the other projects can specify the
+architecture/compiler of choice without this library having been built for that
+target previously.
+
+### Include in a EPICS project
+
+Add the following lines...
+
+1) To `configure/RELEASE`
+
+```
+C_UTILS = /path/to/this/directory/src
 ```
 
-To compile for other architectures:
-```bash
-make CC="/path/to/c-compiler" ARCH="<os>-<your architecture>"
+2) To the `src/Makefile`
+
+```
+## Optional
+include $(C_UTILS)/Makefile.extra
+USR_CFLAGS += $(CFLAGS)
+
+USR_CPPFLAGS += -iquote$(C_UTILS)
+
+<name>_SRCS += $(notdir $(wildcard $(C_UTILS)/*.c))
+VPATH += $(C_UTILS)
 ```
 
-## How to include in a project
+### Include in other projects
 
+Here is an example of how to include in other projects Makefile. This may
+require adjustment for project with different or more complicated build systems.
 
-### EPICS IOC
+1) Add the following lines to your src Makefile.
 
-1) Add this line to configure/RELEASE
 ```
-C-UTILS = /path/to/this/directory
-```
-2) Add `c-utils` as an external library in src makefiles
-```
-<your_project>_LIBS += c-utils
-```
+C_UTILS = /path/to/this/directory/src
 
-### Other Projects
+include $(C_UTILS)/Makefile.extra # Optional
 
-Include as you would another library.
+# Add include path
+CPPFLAGS += -iquote$(C_UTILS)
 
-1) Add the following flags to your compile command.
+# Add C_UTILS to your list of sources
+<name>_SRCS = $(notdir $(wildcard $(C_UTILS)/*.c))
+
+# Build base-c-utils objects in current directory
+%.o: $(C_UTILS)/%.c
+    $(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 ```
--I</path/to/this/directory>/include
--L</path/to/this/directory>/lib/<os>-<target-architecture>
--lc-utils
-```
-
-2) If including Makefile.extra, add `$(CFLAGS) $(CPPFLAGS) $(LDFLAGS) ` to the
-compile command.
