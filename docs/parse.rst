@@ -81,7 +81,8 @@ Other Functions
 
 ..  function:: char get_char(const char **string)
 
-    Returns the next character at `*string` and advances past it.
+    Returns the next character at `*string` and advances past it.  If `*string`
+    is empty then `'\0'` is returned and the `string` is not advanced.
 
 ..  function:: void skip_whitespace(const char **string)
 
