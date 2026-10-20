@@ -74,12 +74,26 @@ error__t parse_uint32_array(
 /* Parses an array of unsigned integers of unknown length from string into
  * result. Counts the number of entries in length. */
 error__t parse_uint_array(
-    const char **string, size_t *length, unsigned int result[], size_t max_length);
+    const char **string, size_t *length,
+    unsigned int result[], size_t max_length);
 
 /* Parses an array of doubles of unknown length from string into
  * result. Counts the number of entries in length.  */
 error__t parse_double_array(
     const char **string, size_t *length, double result[], size_t max_length);
+
+
+#define __id_DO_PARSE(string_in, parse, string, result...)  \
+    ( {                                                     \
+      const char *string_in = (string);                     \
+      (parse)(&string_in, ##result)  ?:                     \
+          parse_eos(&string_in);                            \
+    } )
+
+/* Wraps parsing for a complete string */
+#define DO_PARSE(parse, string, result...) \
+    __id_DO_PARSE(UNIQUE_ID(), parse, string, result)
+
 
 /* Write a max of length bytes of the formatted string to *result and increments
  * the string */
