@@ -71,6 +71,30 @@ will stop parsing at the first non digit character found.
     Checks for end of the input string.  If `\0` is found returns `ERROR_OK`
     otherwise returns an error.
 
+..  macro:: error__t DO_PARSE(\
+        parse_function, string, result...)
+
+    Parses a complete string using the method defined in `parse_function`.
+    Checks that all of the string has been parsed and stores the result into
+    `result`. It is preferably used in conjunction with the above functions
+    when parsing a variable buffer as well as command line arguments.
+    It is used as follows::
+
+        char example[5];
+        memset(example, '1', 4);
+        unsigned int result;
+        error__t error = DO_PARSE(parse_uint, example, &result);
+
+    Is functionally equivalent to::
+
+        char example[5];
+        memset(example, '1', 4);
+        unsigned int result;
+        const char *pExample = example;
+        error__t error =
+            parse_uint(&pExample, &result)  ?:
+            parse_eos(&pExample);
+
 Other Functions
 ---------------
 
