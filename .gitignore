@@ -1,9 +1,7 @@
 # Local configuration
 /CONFIG
 
-lib
-include
-src/O.*
+/.vscode
 
 # Python droppings
 __pycache__
