@@ -1,0 +1,15 @@
+TAR_FILE=none
+prog=none
+
+# Only one tool to build. rmq just deletes ipc msg queue.
+build()
+{
+    echo "Nothing to build"
+}
+
+# Overwrite default clean as little needs doing.
+clean()
+{
+    echo "Nothing to clean"
+}
+
